@@ -79,3 +79,10 @@ confira o `git diff` das referências antes de commitar.
 
 A *feature* `imagem` compila codificadores de AVIF e WebP e precisa de um
 compilador C. A primeira compilação leva alguns minutos.
+
+`processar_imagem` aceita JPG, PNG e WebP. AVIF é só formato de saída.
+
+## Desenho
+
+A spec fica no repositório do CMS:
+[2026-10-09-motor-web-design.md](https://github.com/avilaops/cms.avilaops.com/blob/main/docs/superpowers/specs/2026-10-09-motor-web-design.md).

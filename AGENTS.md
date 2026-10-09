@@ -4,8 +4,9 @@ Crate Rust da Ávila Ops com as regras de conteúdo usadas pelo CMS e pelo
 Lojas. Nicolas Avila (sem acento) é quem decide. Comunicar em português, com
 resposta direta e evidência.
 
-O desenho está em `docs/superpowers/specs/2026-10-09-motor-web-design.md` do
-repositório do CMS.
+O desenho está no repositório do CMS:
+[2026-10-09-motor-web-design.md](https://github.com/avilaops/cms.avilaops.com/blob/main/docs/superpowers/specs/2026-10-09-motor-web-design.md).
+Mudou o comportamento do crate, aquele documento muda no mesmo trabalho.
 
 ## Regras do projeto
 
