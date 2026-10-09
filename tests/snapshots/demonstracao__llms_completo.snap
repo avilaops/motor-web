@@ -1,0 +1,134 @@
+---
+source: tests/demonstracao.rs
+expression: "gerar_llms_completo(&site, &itens)"
+---
+# Oficina Exemplo
+
+> Marcenaria sob medida que projeta, fabrica e instala móveis de madeira maciça para casas e pequenos comércios.
+
+## Móveis de madeira maciça feitos sob medida
+
+Endereço: https://oficina-exemplo.example/
+Atualizado em: 2026-09-15
+
+Projetamos, fabricamos e instalamos móveis de madeira maciça para casas e pequenos comércios.
+
+## Como trabalhamos
+
+1. Visita e medição.
+2. Projeto em 3D.
+3. Fabricação e instalação.
+
+## Como escolher a madeira da mesa de jantar
+
+Endereço: https://oficina-exemplo.example/blog/como-escolher-a-madeira-da-mesa
+Atualizado em: 2026-09-03
+
+A mesa de jantar é o móvel que mais apanha em uma casa. A madeira certa aguenta o uso sem perder a cara.
+
+## O que olhar na madeira
+
+- Dureza: madeiras duras marcam menos.
+- Veio: define o desenho do tampo.
+- Origem: peça sempre o documento de procedência.
+
+### Acabamento
+
+O acabamento protege e muda a cor. Veja [o guia de acabamentos](/blog/guia-de-acabamentos-para-madeira) antes de decidir.
+
+![Quatro amostras de madeira com acabamentos diferentes](/midia/amostras-de-acabamento-0a1b2c3d-1200.webp)
+
+Quer ver as madeiras de perto? [Agende uma visita](/contato)
+
+## Como nasce uma estante na nossa oficina
+
+Endereço: https://oficina-exemplo.example/blog/como-nasce-uma-estante
+Atualizado em: 2026-09-16
+
+Uma estante passa por cinco mãos antes de chegar à sala do cliente.
+
+## Do desenho ao corte
+
+O projeto em 3D vira uma lista de corte, e cada tábua é escolhida pelo veio.
+
+## Cuidados com móveis de madeira no dia a dia
+
+Endereço: https://oficina-exemplo.example/blog/cuidados-com-moveis-de-madeira
+Atualizado em: 2026-10-02
+
+Madeira maciça é resistente, mas reage a sol, água e calor.
+
+## Limpeza
+
+Pano macio e levemente úmido. Produto com silicone deixa a superfície escorregadia e mancha.
+
+## Sol e umidade
+
+Luz direta clareia a madeira, e a mudança é desigual se houver objetos sobre o tampo.
+
+## Guia de acabamentos para madeira
+
+Endereço: https://oficina-exemplo.example/blog/guia-de-acabamentos-para-madeira
+Atualizado em: 2026-09-10
+
+Cada acabamento muda a cor, o toque e a manutenção da peça.
+
+## Comparação
+
+| Acabamento | Resistência | Manutenção |
+| --- | --- | --- |
+| Óleo | Média | Reaplicar todo ano |
+| Verniz | Alta | Lixar para refazer |
+
+## Aplicação
+
+1. Lixe no sentido do veio.
+2. Limpe o pó.
+3. Aplique em camadas finas.
+
+[Aplicação de óleo em tampo de mesa](https://www.youtube.com/watch?v=exemplo0001)
+
+## Perguntas frequentes sobre móveis sob medida
+
+Endereço: https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida
+Atualizado em: 2026-09-02
+
+Reunimos as dúvidas que aparecem em quase toda primeira conversa.
+
+**Quanto tempo leva um projeto?**
+
+De 30 a 60 dias, da aprovação do desenho à instalação.
+
+**Os móveis têm garantia?**
+
+Sim, cinco anos para estrutura e um ano para ferragens.
+
+## Contato
+
+Endereço: https://oficina-exemplo.example/contato
+Atualizado em: 2026-09-15
+
+Atendemos de segunda a sexta, das 8h às 18h, com hora marcada.
+
+## Serviços
+
+Endereço: https://oficina-exemplo.example/servicos
+Atualizado em: 2026-09-15
+
+## O que fazemos
+
+| Serviço | Prazo médio |
+| --- | --- |
+| Mesa de jantar | 30 dias |
+| Estante sob medida | 45 dias |
+| Restauro | A combinar |
+
+## Sobre a oficina
+
+Endereço: https://oficina-exemplo.example/sobre
+Atualizado em: 2026-09-15
+
+A Oficina Exemplo nasceu em uma garagem e hoje ocupa um galpão com seis pessoas.
+
+> Móvel bom é o que o neto herda.
+> — Helena Prado

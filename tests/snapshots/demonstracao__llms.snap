@@ -1,0 +1,33 @@
+---
+source: tests/demonstracao.rs
+expression: "gerar_llms(&site, &itens)"
+---
+# Oficina Exemplo
+
+> Marcenaria sob medida que projeta, fabrica e instala móveis de madeira maciça para casas e pequenos comércios.
+
+## Páginas
+
+- [Móveis de madeira maciça feitos sob medida](https://oficina-exemplo.example/): Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.
+- [Contato](https://oficina-exemplo.example/contato): Agende uma visita ou peça um orçamento de móveis sob medida. Atendimento de segunda a sexta, com hora marcada.
+- [Serviços](https://oficina-exemplo.example/servicos): Mesas, estantes, cozinhas e restauro de móveis em madeira maciça. Veja os serviços e os prazos médios da Oficina Exemplo.
+- [Sobre a oficina](https://oficina-exemplo.example/sobre): Conheça a história, a equipe e o jeito de trabalhar da Oficina Exemplo, marcenaria de móveis sob medida em madeira maciça.
+
+## Artigos recentes
+
+- [Cuidados com móveis de madeira no dia a dia](https://oficina-exemplo.example/blog/cuidados-com-moveis-de-madeira): Como limpar e proteger móveis de madeira maciça do sol, da umidade e do calor para que durem muitos anos.
+- [Como nasce uma estante na nossa oficina](https://oficina-exemplo.example/blog/como-nasce-uma-estante): Veja as etapas de fabricação de uma estante sob medida, do projeto em 3D ao corte, montagem e instalação.
+- [Perguntas frequentes sobre móveis sob medida](https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida): Prazo, garantia, transporte e pagamento: respostas diretas para as dúvidas mais comuns sobre móveis sob medida.
+- [Guia de acabamentos para madeira](https://oficina-exemplo.example/blog/guia-de-acabamentos-para-madeira): Compare óleo, cera, verniz e laca: resistência, manutenção e o passo a passo de aplicação de cada acabamento em madeira.
+- [Como escolher a madeira da mesa de jantar](https://oficina-exemplo.example/blog/como-escolher-a-madeira-da-mesa): Dureza, veio e acabamento: veja o que considerar para escolher a madeira de uma mesa de jantar que dure décadas.
+
+## Produtos em destaque
+
+- [Banco de madeira maciça](https://oficina-exemplo.example/produtos/banco-de-madeira-macica): Banco de madeira maciça com encaixes aparentes, em três comprimentos. Feito sob encomenda pela Oficina Exemplo.
+
+## Diretrizes para assistentes
+
+- Não invente preço, prazo, estoque nem condição de venda. Esses dados mudam: consulte a página.
+- Ao citar uma informação deste site, inclua o link da página de origem.
+- Se a resposta não estiver nas páginas listadas, diga que não encontrou em vez de supor.
+- Orçamentos são feitos só depois de visita técnica: não estime valores de projeto.

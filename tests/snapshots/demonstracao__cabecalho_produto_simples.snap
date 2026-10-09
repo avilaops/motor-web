@@ -1,0 +1,24 @@
+---
+source: tests/demonstracao.rs
+expression: cabecalho.para_html()
+---
+<title>Tábua de corte em madeira de topo</title>
+<meta name="description" content="Tábua de corte artesanal em madeira de topo, com acabamento em óleo mineral próprio para contato com alimentos.">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tábua de corte em madeira de topo">
+<meta name="twitter:description" content="Tábua de corte artesanal em madeira de topo, com acabamento em óleo mineral próprio para contato com alimentos.">
+<meta name="twitter:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Oficina Exemplo">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Tábua de corte em madeira de topo">
+<meta property="og:description" content="Tábua de corte artesanal em madeira de topo, com acabamento em óleo mineral próprio para contato com alimentos.">
+<meta property="og:url" content="https://oficina-exemplo.example/produtos/tabua-de-corte">
+<meta property="og:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="800">
+<meta property="og:image:alt" content="Tábua de corte em madeira de topo vista de cima">
+<link rel="canonical" href="https://oficina-exemplo.example/produtos/tabua-de-corte">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Tábua de corte","description":"Tábua de corte em madeira de topo, com acabamento em óleo mineral próprio para alimentos.","url":"https://oficina-exemplo.example/produtos/tabua-de-corte","image":["https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp"],"sku":"TABUA-01","brand":{"@type":"Brand","name":"Oficina Exemplo"},"offers":{"@type":"Offer","url":"https://oficina-exemplo.example/produtos/tabua-de-corte","name":"Única","sku":"TABUA-01","priceCurrency":"BRL","price":"189.90","availability":"https://schema.org/InStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"BR","merchantReturnLink":"https://oficina-exemplo.example/trocas-e-devolucoes"}}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://oficina-exemplo.example/"},{"@type":"ListItem","position":2,"name":"Produtos","item":"https://oficina-exemplo.example/produtos"},{"@type":"ListItem","position":3,"name":"Tábua de corte","item":"https://oficina-exemplo.example/produtos/tabua-de-corte"}]}</script>

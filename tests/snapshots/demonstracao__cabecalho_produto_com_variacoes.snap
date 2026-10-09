@@ -1,0 +1,24 @@
+---
+source: tests/demonstracao.rs
+expression: cabecalho.para_html()
+---
+<title>Banco de madeira maciça sob encomenda</title>
+<meta name="description" content="Banco de madeira maciça com encaixes aparentes, em três comprimentos. Feito sob encomenda pela Oficina Exemplo.">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Banco de madeira maciça sob encomenda">
+<meta name="twitter:description" content="Banco de madeira maciça com encaixes aparentes, em três comprimentos. Feito sob encomenda pela Oficina Exemplo.">
+<meta name="twitter:image" content="https://oficina-exemplo.example/midia/banco-de-frente-0a1b2c3d-1200.webp">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Oficina Exemplo">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Banco de madeira maciça sob encomenda">
+<meta property="og:description" content="Banco de madeira maciça com encaixes aparentes, em três comprimentos. Feito sob encomenda pela Oficina Exemplo.">
+<meta property="og:url" content="https://oficina-exemplo.example/produtos/banco-de-madeira-macica">
+<meta property="og:image" content="https://oficina-exemplo.example/midia/banco-de-frente-0a1b2c3d-1200.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="800">
+<meta property="og:image:alt" content="Banco de madeira maciça visto de frente">
+<link rel="canonical" href="https://oficina-exemplo.example/produtos/banco-de-madeira-macica">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Banco de madeira maciça","description":"Banco de madeira maciça com encaixes aparentes, feito sob encomenda em três comprimentos.","url":"https://oficina-exemplo.example/produtos/banco-de-madeira-macica","image":["https://oficina-exemplo.example/midia/banco-de-frente-0a1b2c3d-1200.webp","https://oficina-exemplo.example/midia/banco-encaixe-0a1b2c3d-1200.webp"],"sku":"BANCO-100","brand":{"@type":"Brand","name":"Oficina Exemplo"},"aggregateRating":{"@type":"AggregateRating","ratingValue":4.8,"reviewCount":23},"offers":{"@type":"AggregateOffer","priceCurrency":"BRL","lowPrice":"890.00","highPrice":"1490.50","offerCount":3,"offers":[{"@type":"Offer","url":"https://oficina-exemplo.example/produtos/banco-de-madeira-macica","name":"1,00 m","sku":"BANCO-100","gtin":"7890000000017","priceCurrency":"BRL","price":"890.00","availability":"https://schema.org/InStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"BR","merchantReturnLink":"https://oficina-exemplo.example/trocas-e-devolucoes"}},{"@type":"Offer","url":"https://oficina-exemplo.example/produtos/banco-de-madeira-macica","name":"1,40 m","sku":"BANCO-140","priceCurrency":"BRL","price":"1190.00","availability":"https://schema.org/BackOrder","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"BR","merchantReturnLink":"https://oficina-exemplo.example/trocas-e-devolucoes"}},{"@type":"Offer","url":"https://oficina-exemplo.example/produtos/banco-de-madeira-macica","name":"1,80 m","sku":"BANCO-180","priceCurrency":"BRL","price":"1490.50","availability":"https://schema.org/OutOfStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"BR","merchantReturnLink":"https://oficina-exemplo.example/trocas-e-devolucoes"}}]}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://oficina-exemplo.example/"},{"@type":"ListItem","position":2,"name":"Produtos","item":"https://oficina-exemplo.example/produtos"},{"@type":"ListItem","position":3,"name":"Banco de madeira maciça","item":"https://oficina-exemplo.example/produtos/banco-de-madeira-macica"}]}</script>

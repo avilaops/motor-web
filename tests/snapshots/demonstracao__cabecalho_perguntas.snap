@@ -1,0 +1,27 @@
+---
+source: tests/demonstracao.rs
+expression: cabecalho.para_html()
+---
+<title>Móveis sob medida: perguntas frequentes</title>
+<meta name="description" content="Prazo, garantia, transporte e pagamento: respostas diretas para as dúvidas mais comuns sobre móveis sob medida.">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Móveis sob medida: perguntas frequentes">
+<meta name="twitter:description" content="Prazo, garantia, transporte e pagamento: respostas diretas para as dúvidas mais comuns sobre móveis sob medida.">
+<meta name="twitter:image" content="https://oficina-exemplo.example/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Oficina Exemplo">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Móveis sob medida: perguntas frequentes">
+<meta property="og:description" content="Prazo, garantia, transporte e pagamento: respostas diretas para as dúvidas mais comuns sobre móveis sob medida.">
+<meta property="og:url" content="https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida">
+<meta property="og:image" content="https://oficina-exemplo.example/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="Projetista mostrando um desenho de estante a um casal">
+<meta property="article:published_time" content="2026-09-02T12:00:00Z">
+<meta property="article:modified_time" content="2026-09-02T12:00:00Z">
+<link rel="canonical" href="https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Article","headline":"Perguntas frequentes sobre móveis sob medida","description":"Prazo, garantia e transporte: as dúvidas que mais ouvimos antes de um projeto.","image":["https://oficina-exemplo.example/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp"],"datePublished":"2026-09-02T12:00:00Z","dateModified":"2026-09-02T12:00:00Z","author":{"@type":"Person","name":"Rafael Nunes","jobTitle":"Projetista","description":"Desenha os projetos em 3D e acompanha a instalação na casa do cliente.","image":"https://oficina-exemplo.example/midia/rafael-nunes-0a1b2c3d-800.webp"},"publisher":{"@id":"https://oficina-exemplo.example/#organizacao"},"mainEntityOfPage":"https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida","articleSection":"Guias","keywords":"sob medida","wordCount":40,"inLanguage":"pt-BR"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://oficina-exemplo.example/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://oficina-exemplo.example/blog"},{"@type":"ListItem","position":3,"name":"Perguntas frequentes sobre móveis sob medida","item":"https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Quanto tempo leva um projeto?","acceptedAnswer":{"@type":"Answer","text":"De 30 a 60 dias, da aprovação do desenho à instalação."}},{"@type":"Question","name":"Os móveis têm garantia?","acceptedAnswer":{"@type":"Answer","text":"Sim, cinco anos para estrutura e um ano para ferragens."}}]}</script>

@@ -1,0 +1,19 @@
+---
+source: tests/demonstracao.rs
+expression: cabecalho.para_html()
+---
+<title>Oficina Exemplo: marcenaria sob medida em madeira maciça</title>
+<meta name="description" content="Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oficina Exemplo: marcenaria sob medida em madeira maciça">
+<meta name="twitter:description" content="Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Oficina Exemplo">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Oficina Exemplo: marcenaria sob medida em madeira maciça">
+<meta property="og:description" content="Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.">
+<meta property="og:url" content="https://oficina-exemplo.example/">
+<link rel="canonical" href="https://oficina-exemplo.example/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://oficina-exemplo.example/#organizacao","name":"Oficina Exemplo","url":"https://oficina-exemplo.example/","logo":"https://oficina-exemplo.example/midia/logo-oficina-exemplo-0a1b2c3d-512.webp","legalName":"Oficina Exemplo Marcenaria Ltda.","telephone":"+55 16 5550-0100","email":"contato@oficina-exemplo.example","address":{"@type":"PostalAddress","streetAddress":"Rua das Acácias, 100","addressLocality":"Ribeirão Preto","addressRegion":"SP","postalCode":"14000-000","addressCountry":"BR"},"sameAs":["https://www.instagram.com/oficina.exemplo"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://oficina-exemplo.example/#site","name":"Oficina Exemplo","url":"https://oficina-exemplo.example/","description":"Marcenaria sob medida que projeta, fabrica e instala móveis de madeira maciça para casas e pequenos comércios.","inLanguage":"pt-BR","publisher":{"@id":"https://oficina-exemplo.example/#organizacao"}}</script>

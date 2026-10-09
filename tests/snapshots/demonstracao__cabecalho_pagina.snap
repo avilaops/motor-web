@@ -1,0 +1,24 @@
+---
+source: tests/demonstracao.rs
+expression: cabecalho.para_html()
+---
+<title>Sobre a Oficina Exemplo</title>
+<meta name="description" content="Conheça a história, a equipe e o jeito de trabalhar da Oficina Exemplo, marcenaria de móveis sob medida em madeira maciça.">
+<meta name="robots" content="index, follow">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sobre a Oficina Exemplo">
+<meta name="twitter:description" content="Conheça a história, a equipe e o jeito de trabalhar da Oficina Exemplo, marcenaria de móveis sob medida em madeira maciça.">
+<meta name="twitter:image" content="https://oficina-exemplo.example/midia/galpao-da-oficina-0a1b2c3d-1200.webp">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Oficina Exemplo">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Sobre a Oficina Exemplo">
+<meta property="og:description" content="Conheça a história, a equipe e o jeito de trabalhar da Oficina Exemplo, marcenaria de móveis sob medida em madeira maciça.">
+<meta property="og:url" content="https://oficina-exemplo.example/sobre">
+<meta property="og:image" content="https://oficina-exemplo.example/midia/galpao-da-oficina-0a1b2c3d-1200.webp">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="675">
+<meta property="og:image:alt" content="Galpão da oficina com bancadas e tábuas empilhadas">
+<link rel="canonical" href="https://oficina-exemplo.example/sobre">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Sobre a oficina","url":"https://oficina-exemplo.example/sobre","description":"Conheça a história, a equipe e o jeito de trabalhar da Oficina Exemplo, marcenaria de móveis sob medida em madeira maciça.","inLanguage":"pt-BR","datePublished":"2026-07-01T12:00:00Z","dateModified":"2026-09-15T12:00:00Z","primaryImageOfPage":"https://oficina-exemplo.example/midia/galpao-da-oficina-0a1b2c3d-1200.webp","isPartOf":{"@id":"https://oficina-exemplo.example/#site"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Início","item":"https://oficina-exemplo.example/"},{"@type":"ListItem","position":2,"name":"Sobre a oficina","item":"https://oficina-exemplo.example/sobre"}]}</script>

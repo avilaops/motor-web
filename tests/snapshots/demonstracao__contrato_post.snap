@@ -1,0 +1,246 @@
+---
+source: tests/demonstracao.rs
+expression: "serde_json::to_string_pretty(&demonstracao::post_de_exemplo()).expect(\"JSON\")"
+---
+{
+  "caminho": "/blog/como-escolher-a-madeira-da-mesa",
+  "conteudo": {
+    "especie": "post",
+    "dados": {
+      "tipo": "artigo",
+      "slug": "como-escolher-a-madeira-da-mesa",
+      "titulo": "Como escolher a madeira da mesa de jantar",
+      "resumo": "Dureza, veio e acabamento: o que pesa na escolha da madeira de uma mesa que vai durar décadas.",
+      "capa": {
+        "id": "capa-como-escolher-a-madeira-da-mesa",
+        "alt": "Tampo de mesa em madeira maciça com o veio aparente",
+        "largura": 1920,
+        "altura": 1080,
+        "variantes": [
+          {
+            "formato": "avif",
+            "largura": 480,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-480.avif"
+          },
+          {
+            "formato": "webp",
+            "largura": 480,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-480.webp"
+          },
+          {
+            "formato": "avif",
+            "largura": 768,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-768.avif"
+          },
+          {
+            "formato": "webp",
+            "largura": 768,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-768.webp"
+          },
+          {
+            "formato": "avif",
+            "largura": 1200,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-1200.avif"
+          },
+          {
+            "formato": "webp",
+            "largura": 1200,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-1200.webp"
+          },
+          {
+            "formato": "avif",
+            "largura": 1920,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-1920.avif"
+          },
+          {
+            "formato": "webp",
+            "largura": 1920,
+            "url": "/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-1920.webp"
+          }
+        ]
+      },
+      "corpo": [
+        {
+          "tipo": "paragrafo",
+          "trechos": [
+            {
+              "texto": "A mesa de jantar é o móvel que mais apanha em uma casa. A madeira certa aguenta o uso sem perder a cara."
+            }
+          ]
+        },
+        {
+          "tipo": "titulo",
+          "nivel": 2,
+          "texto": "O que olhar na madeira"
+        },
+        {
+          "tipo": "lista",
+          "ordenada": false,
+          "itens": [
+            "Dureza: madeiras duras marcam menos.",
+            "Veio: define o desenho do tampo.",
+            "Origem: peça sempre o documento de procedência."
+          ]
+        },
+        {
+          "tipo": "titulo",
+          "nivel": 3,
+          "texto": "Acabamento"
+        },
+        {
+          "tipo": "paragrafo",
+          "trechos": [
+            {
+              "texto": "O acabamento protege e muda a cor. Veja "
+            },
+            {
+              "texto": "o guia de acabamentos",
+              "link": "/blog/guia-de-acabamentos-para-madeira"
+            },
+            {
+              "texto": " antes de decidir."
+            }
+          ]
+        },
+        {
+          "tipo": "imagem",
+          "midia": {
+            "id": "amostras-de-acabamento",
+            "alt": "Quatro amostras de madeira com acabamentos diferentes",
+            "largura": 1600,
+            "altura": 900,
+            "variantes": [
+              {
+                "formato": "avif",
+                "largura": 480,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-480.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 480,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-480.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 768,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-768.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 768,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-768.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1200,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-1200.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1200,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-1200.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1600,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-1600.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1600,
+                "url": "/midia/amostras-de-acabamento-0a1b2c3d-1600.webp"
+              }
+            ],
+            "legenda": "Amostras de acabamento sobre a mesma madeira.",
+            "credito": "Oficina Exemplo"
+          }
+        },
+        {
+          "tipo": "chamada",
+          "texto": "Quer ver as madeiras de perto?",
+          "rotulo": "Agende uma visita",
+          "url": "/contato"
+        }
+      ],
+      "autor": {
+        "slug": "helena-prado",
+        "nome": "Helena Prado",
+        "cargo": "Marceneira e sócia",
+        "bio": "Marceneira há quinze anos, cuida dos projetos e do acabamento de cada peça que sai da oficina.",
+        "foto": {
+          "id": "helena-prado",
+          "alt": "Helena Prado lixando o tampo de uma mesa",
+          "largura": 800,
+          "altura": 800,
+          "variantes": [
+            {
+              "formato": "avif",
+              "largura": 480,
+              "url": "/midia/helena-prado-0a1b2c3d-480.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 480,
+              "url": "/midia/helena-prado-0a1b2c3d-480.webp"
+            },
+            {
+              "formato": "avif",
+              "largura": 768,
+              "url": "/midia/helena-prado-0a1b2c3d-768.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 768,
+              "url": "/midia/helena-prado-0a1b2c3d-768.webp"
+            },
+            {
+              "formato": "avif",
+              "largura": 800,
+              "url": "/midia/helena-prado-0a1b2c3d-800.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 800,
+              "url": "/midia/helena-prado-0a1b2c3d-800.webp"
+            }
+          ]
+        },
+        "perfis": [
+          "https://www.linkedin.com/in/helena-prado-exemplo"
+        ],
+        "credenciais": [
+          "Técnica em Design de Móveis"
+        ]
+      },
+      "categoria": {
+        "slug": "guias",
+        "nome": "Guias"
+      },
+      "tags": [
+        "madeira",
+        "mesa de jantar"
+      ],
+      "publicadoEm": "2026-08-12T12:00:00Z",
+      "atualizadoEm": "2026-09-03T12:00:00Z",
+      "seo": {
+        "titulo": "Como escolher a madeira da mesa de jantar",
+        "descricao": "Dureza, veio e acabamento: veja o que considerar para escolher a madeira de uma mesa de jantar que dure décadas.",
+        "indexar": true
+      },
+      "trilha": [
+        {
+          "nome": "Início",
+          "url": "/"
+        },
+        {
+          "nome": "Blog",
+          "url": "/blog"
+        },
+        {
+          "nome": "Como escolher a madeira da mesa de jantar",
+          "url": "/blog/como-escolher-a-madeira-da-mesa"
+        }
+      ]
+    }
+  }
+}

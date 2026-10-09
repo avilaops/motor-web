@@ -1,0 +1,10 @@
+---
+source: tests/demonstracao.rs
+expression: "gerar_robots(&site, &OpcoesRobots::default())"
+---
+User-agent: *
+Allow: /
+Disallow: /painel
+Disallow: /api
+
+Sitemap: https://oficina-exemplo.example/sitemap.xml

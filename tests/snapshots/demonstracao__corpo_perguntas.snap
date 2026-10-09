@@ -1,0 +1,8 @@
+---
+source: tests/demonstracao.rs
+expression: pagina_montada(&documento(caminho))
+---
+<h1>Perguntas frequentes sobre móveis sob medida</h1>
+<picture><source type="image/avif" srcset="/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-480.avif 480w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-768.avif 768w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.avif 1200w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1920.avif 1920w" sizes="100vw"><source type="image/webp" srcset="/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-480.webp 480w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-768.webp 768w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp 1200w, /midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1920.webp 1920w" sizes="100vw"><img src="/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp" alt="Projetista mostrando um desenho de estante a um casal" width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async"></picture>
+<p>Reunimos as dúvidas que aparecem em quase toda primeira conversa.</p>
+<dl class="perguntas"><dt>Quanto tempo leva um projeto?</dt><dd>De 30 a 60 dias, da aprovação do desenho à instalação.</dd><dt>Os móveis têm garantia?</dt><dd>Sim, cinco anos para estrutura e um ano para ferragens.</dd></dl>

@@ -1,0 +1,12 @@
+---
+source: tests/demonstracao.rs
+expression: pagina_montada(&documento(caminho))
+---
+<h1>Guia de acabamentos para madeira</h1>
+<picture><source type="image/avif" srcset="/midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-480.avif 480w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-768.avif 768w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1200.avif 1200w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1920.avif 1920w" sizes="100vw"><source type="image/webp" srcset="/midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-480.webp 480w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-768.webp 768w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1200.webp 1200w, /midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1920.webp 1920w" sizes="100vw"><img src="/midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1200.webp" alt="Pincel aplicando óleo sobre uma tábua de madeira clara" width="1920" height="1080" loading="eager" fetchpriority="high" decoding="async"></picture>
+<p>Cada acabamento muda a cor, o toque e a manutenção da peça.</p>
+<h2>Comparação</h2>
+<table><thead><tr><th scope="col">Acabamento</th><th scope="col">Resistência</th><th scope="col">Manutenção</th></tr></thead><tbody><tr><td>Óleo</td><td>Média</td><td>Reaplicar todo ano</td></tr><tr><td>Verniz</td><td>Alta</td><td>Lixar para refazer</td></tr></tbody></table>
+<h2>Aplicação</h2>
+<ol><li>Lixe no sentido do veio.</li><li>Limpe o pó.</li><li>Aplique em camadas finas.</li></ol>
+<iframe src="https://www.youtube-nocookie.com/embed/exemplo0001" title="Aplicação de óleo em tampo de mesa" width="560" height="315" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>

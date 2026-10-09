@@ -1,0 +1,159 @@
+---
+source: tests/demonstracao.rs
+expression: sitemaps
+---
+=== sitemap.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://oficina-exemplo.example/sitemap-paginas.xml</loc>
+    <lastmod>2026-09-15T12:00:00Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://oficina-exemplo.example/sitemap-posts.xml</loc>
+    <lastmod>2026-10-02T12:00:00Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://oficina-exemplo.example/sitemap-categorias.xml</loc>
+    <lastmod>2026-10-02T12:00:00Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://oficina-exemplo.example/sitemap-produtos.xml</loc>
+    <lastmod>2026-09-22T12:00:00Z</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://oficina-exemplo.example/sitemap-imagens.xml</loc>
+    <lastmod>2026-10-02T12:00:00Z</lastmod>
+  </sitemap>
+</sitemapindex>
+
+=== sitemap-paginas.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://oficina-exemplo.example/</loc>
+    <lastmod>2026-09-15T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/contato</loc>
+    <lastmod>2026-09-15T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/servicos</loc>
+    <lastmod>2026-09-15T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/sobre</loc>
+    <lastmod>2026-09-15T12:00:00Z</lastmod>
+  </url>
+</urlset>
+
+=== sitemap-posts.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://oficina-exemplo.example/blog/como-escolher-a-madeira-da-mesa</loc>
+    <lastmod>2026-09-03T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/como-nasce-uma-estante</loc>
+    <lastmod>2026-09-16T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/cuidados-com-moveis-de-madeira</loc>
+    <lastmod>2026-10-02T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/guia-de-acabamentos-para-madeira</loc>
+    <lastmod>2026-09-10T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida</loc>
+    <lastmod>2026-09-02T12:00:00Z</lastmod>
+  </url>
+</urlset>
+
+=== sitemap-categorias.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://oficina-exemplo.example/blog/categoria/guias</loc>
+    <lastmod>2026-09-10T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/categoria/oficina</loc>
+    <lastmod>2026-10-02T12:00:00Z</lastmod>
+  </url>
+</urlset>
+
+=== sitemap-produtos.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://oficina-exemplo.example/produtos/banco-de-madeira-macica</loc>
+    <lastmod>2026-09-20T12:00:00Z</lastmod>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/produtos/tabua-de-corte</loc>
+    <lastmod>2026-09-22T12:00:00Z</lastmod>
+  </url>
+</urlset>
+
+=== sitemap-imagens.xml ===
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://oficina-exemplo.example/blog/como-escolher-a-madeira-da-mesa</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/capa-como-escolher-a-madeira-da-mesa-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/amostras-de-acabamento-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/como-nasce-uma-estante</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/capa-como-nasce-uma-estante-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/cuidados-com-moveis-de-madeira</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/capa-cuidados-com-moveis-de-madeira-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/guia-de-acabamentos-para-madeira</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/capa-guia-de-acabamentos-para-madeira-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/blog/perguntas-sobre-moveis-sob-medida</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/capa-perguntas-sobre-moveis-sob-medida-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/produtos/banco-de-madeira-macica</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/banco-de-frente-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/banco-encaixe-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/produtos/tabua-de-corte</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://oficina-exemplo.example/sobre</loc>
+    <image:image>
+      <image:loc>https://oficina-exemplo.example/midia/galpao-da-oficina-0a1b2c3d-1200.webp</image:loc>
+    </image:image>
+  </url>
+</urlset>

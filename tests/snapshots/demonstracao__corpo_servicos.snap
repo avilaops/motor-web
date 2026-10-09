@@ -1,0 +1,8 @@
+---
+source: tests/demonstracao.rs
+expression: pagina_montada(&documento(caminho))
+---
+<h1>Serviços</h1>
+
+<h2>O que fazemos</h2>
+<table><thead><tr><th scope="col">Serviço</th><th scope="col">Prazo médio</th></tr></thead><tbody><tr><td>Mesa de jantar</td><td>30 dias</td></tr><tr><td>Estante sob medida</td><td>45 dias</td></tr><tr><td>Restauro</td><td>A combinar</td></tr></tbody></table>
