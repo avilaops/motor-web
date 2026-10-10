@@ -7,6 +7,7 @@ expression: "serde_json::to_string_pretty(&documento.conteudo).expect(\"json\")"
   "dados": {
     "slug": "apresentacao",
     "titulo": "Móveis de madeira maciça feitos para durar",
+    "menu": "Apresentação",
     "corpo": [
       {
         "tipo": "logos",

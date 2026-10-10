@@ -181,6 +181,9 @@ pub struct Pagina {
     /// Vazio na home.
     pub slug: String,
     pub titulo: String,
+    /// O nome curto da página no menu do site. Sem ele, vale o título.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub menu: Option<String>,
     #[serde(default)]
     pub corpo: Vec<Bloco>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

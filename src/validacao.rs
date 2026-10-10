@@ -15,6 +15,8 @@ use crate::secoes::email_valido;
 use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia};
 use crate::url::{incorporacao_de_video, link_valido};
 
+/// O nome de uma página no menu: cabe em uma linha no celular.
+pub const MENU_MAXIMO: usize = 24;
 pub const TITULO_RECOMENDADO: usize = 60;
 pub const TITULO_MAXIMO: usize = 70;
 pub const DESCRICAO_RECOMENDADA: usize = 155;
@@ -168,6 +170,19 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
             }
             if let Some(abertura) = &pagina.abertura {
                 validar_abertura(abertura, &mut problemas);
+            }
+            if pagina
+                .menu
+                .as_deref()
+                .is_some_and(|menu| comprimento(menu.trim()) > MENU_MAXIMO)
+            {
+                problemas.push(Problema::bloqueia(
+                    "menu.longo",
+                    "menu",
+                    format!(
+                        "O nome no menu passa de {MENU_MAXIMO} caracteres. Use uma ou duas palavras."
+                    ),
+                ));
             }
         }
         Conteudo::Post(post) => {
@@ -920,6 +935,14 @@ mod testes {
             codigos(&problemas),
             vec!["secao.texto.vazio", "secao.botoes"]
         );
+    }
+
+    #[test]
+    fn nome_no_menu_e_curto() {
+        let problemas = com_apresentacao(|pagina| {
+            pagina.menu = Some("Móveis de madeira maciça feitos para durar".into());
+        });
+        assert_eq!(codigos(&problemas), vec!["menu.longo"]);
     }
 
     #[test]

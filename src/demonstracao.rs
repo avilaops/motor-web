@@ -340,6 +340,7 @@ fn pagina(
         conteudo: Conteudo::Pagina(Pagina {
             slug: slug.into(),
             titulo: titulo_da_pagina.into(),
+            menu: None,
             corpo,
             capa,
             abertura: None,
@@ -519,6 +520,7 @@ pub fn apresentacao() -> Documento {
         ),
     );
     if let Conteudo::Pagina(pagina) = &mut documento.conteudo {
+        pagina.menu = Some("Apresentação".into());
         pagina.abertura = Some(Abertura {
             sobretitulo: Some("Marcenaria sob medida".into()),
             texto: "Projetamos, fabricamos e instalamos móveis que atravessam gerações.".into(),
