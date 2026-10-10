@@ -6,9 +6,9 @@ use chrono::{DateTime, NaiveDate, Utc};
 
 use crate::descoberta::PaginaDeCategoria;
 use crate::tipos::{
-    Autor, Avaliacoes, Bloco, Categoria, Conteudo, Disponibilidade, Documento, Endereco, Formato,
-    ItemTrilha, Midia, Organizacao, Pagina, Pergunta, Post, Product, Seo, Site, TipoPost, Trecho,
-    Variacao, Variante,
+    Autor, Avaliacoes, Bloco, Categoria, Conteudo, Direitos, Disponibilidade, Documento, Endereco,
+    Formato, ItemTrilha, Midia, Organizacao, Pagina, Pergunta, Post, Product, Seo, Site, TipoPost,
+    Trecho, Variacao, Variante,
 };
 
 const ORIGEM: &str = "https://oficina-exemplo.example";
@@ -47,6 +47,7 @@ fn midia(nome: &str, alt: &str, largura: u32, altura: u32) -> Midia {
         variantes,
         legenda: None,
         credito: None,
+        direitos: Direitos::default(),
     }
 }
 
@@ -241,6 +242,12 @@ pub fn post_de_exemplo() -> Documento {
                 midia: Midia {
                     legenda: Some("Amostras de acabamento sobre a mesma madeira.".into()),
                     credito: Some("Oficina Exemplo".into()),
+                    direitos: Direitos {
+                        autoria: Some("Helena Prado".into()),
+                        aviso: Some("© 2026 Oficina Exemplo".into()),
+                        licenca: Some("https://creativecommons.org/licenses/by/4.0/".into()),
+                        aquisicao: Some("/contato".into()),
+                    },
                     ..midia(
                         "amostras-de-acabamento",
                         "Quatro amostras de madeira com acabamentos diferentes",

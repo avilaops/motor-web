@@ -4,7 +4,7 @@ use chrono::{DateTime, SecondsFormat, Utc};
 use serde_json::{Map, Value, json};
 
 use crate::conteudo::contar_palavras;
-use crate::midia::url_principal;
+use crate::midia::{url_principal, variante_principal};
 use crate::seo::canonica;
 use crate::tipos::{
     Bloco, Conteudo, Disponibilidade, Documento, Midia, Pagina, Post, Product, Site, TipoPost,
@@ -45,6 +45,67 @@ fn data(momento: DateTime<Utc>) -> String {
 
 fn imagem(midia: &Midia, site: &Site) -> Option<String> {
     url_principal(midia).map(|url| site.url_absoluta(url))
+}
+
+/// A imagem como `ImageObject`: endereço, tamanho, descrição, crédito e
+/// direitos. É daqui que a busca de imagens tira o crédito e o selo de imagem
+/// licenciável. Sem crédito escrito, quem publica é quem leva o crédito.
+fn imagem_ld(midia: &Midia, site: &Site) -> Option<Value> {
+    let variante = variante_principal(midia)?;
+    let url = site.url_absoluta(&variante.url);
+    let direitos = &midia.direitos;
+    let endereco = |valor: &Option<String>| texto(valor).map(|e| site.url_absoluta(&e));
+
+    let mut objeto = Map::new();
+    objeto.insert("@type".into(), "ImageObject".into());
+    objeto.insert("url".into(), url.clone().into());
+    objeto.insert("contentUrl".into(), url.into());
+    objeto.insert("width".into(), variante.largura.into());
+    if midia.largura > 0 {
+        // A altura da variante, na proporção do original.
+        let altura = (u64::from(midia.altura) * u64::from(variante.largura)
+            + u64::from(midia.largura) / 2)
+            / u64::from(midia.largura);
+        objeto.insert("height".into(), altura.into());
+    }
+    objeto.insert("description".into(), midia.alt.clone().into());
+    inserir(&mut objeto, "caption", texto(&midia.legenda));
+    objeto.insert(
+        "creditText".into(),
+        texto(&midia.credito)
+            .unwrap_or_else(|| site.nome.clone())
+            .into(),
+    );
+    if let Some(autoria) = texto(&direitos.autoria) {
+        objeto.insert(
+            "creator".into(),
+            json!({ "@type": "Person", "name": autoria }),
+        );
+    }
+    inserir(&mut objeto, "copyrightNotice", texto(&direitos.aviso));
+    inserir(&mut objeto, "license", endereco(&direitos.licenca));
+    inserir(
+        &mut objeto,
+        "acquireLicensePage",
+        endereco(&direitos.aquisicao),
+    );
+    Some(Value::Object(objeto))
+}
+
+/// A capa, se houver, e depois as imagens do corpo, na ordem em que aparecem.
+fn imagens_ld<'a>(
+    capa: impl IntoIterator<Item = &'a Midia>,
+    corpo: &'a [Bloco],
+    site: &Site,
+) -> Vec<Value> {
+    let do_corpo = corpo.iter().filter_map(|bloco| match bloco {
+        Bloco::Imagem { midia } => Some(midia),
+        _ => None,
+    });
+    capa.into_iter()
+        .chain(do_corpo)
+        .filter_map(|midia| imagem_ld(midia, site))
+        .collect()
 }
 
 /// Insere só o que tem valor: campo opcional ausente some da saída.
@@ -119,8 +180,12 @@ fn pagina_web(pagina: &Pagina, site: &Site, endereco: &str) -> Value {
     inserir(
         &mut objeto,
         "primaryImageOfPage",
-        pagina.capa.as_ref().and_then(|capa| imagem(capa, site)),
+        pagina.capa.as_ref().and_then(|capa| imagem_ld(capa, site)),
     );
+    let imagens = imagens_ld(None, &pagina.corpo, site);
+    if !imagens.is_empty() {
+        objeto.insert("image".into(), imagens.into());
+    }
     objeto.insert("isPartOf".into(), json!({ "@id": id_do_site(site) }));
     Value::Object(objeto)
 }
@@ -146,11 +211,10 @@ fn artigo(post: &Post, site: &Site, endereco: &str) -> Value {
     objeto.insert("@type".into(), tipo.into());
     objeto.insert("headline".into(), post.titulo.clone().into());
     objeto.insert("description".into(), post.resumo.clone().into());
-    inserir(
-        &mut objeto,
-        "image",
-        imagem(&post.capa, site).map(|url| vec![url]),
-    );
+    let imagens = imagens_ld(Some(&post.capa), &post.corpo, site);
+    if !imagens.is_empty() {
+        objeto.insert("image".into(), imagens.into());
+    }
     objeto.insert("datePublished".into(), data(post.publicado_em).into());
     objeto.insert("dateModified".into(), data(post.atualizado_em).into());
     objeto.insert("author".into(), Value::Object(autor));
@@ -205,11 +269,7 @@ fn oferta(variacao: &Variacao, produto: &Product, site: &Site, endereco: &str) -
 }
 
 fn produto_ld(produto: &Product, site: &Site, endereco: &str) -> Value {
-    let imagens: Vec<String> = produto
-        .imagens
-        .iter()
-        .filter_map(|m| imagem(m, site))
-        .collect();
+    let imagens = imagens_ld(&produto.imagens, &[], site);
     let ofertas: Vec<Value> = produto
         .variacoes
         .iter()
@@ -340,6 +400,61 @@ mod testes {
         montar_json_ld(&documento, &demonstracao::site())
             .expect("produto válido")
             .remove(0)
+    }
+
+    #[test]
+    fn imagem_sai_como_image_object_com_credito_e_direitos() {
+        let site = demonstracao::site();
+        let itens = montar_json_ld(&demonstracao::post_de_exemplo(), &site).expect("post válido");
+        let imagens = itens[0]["image"].as_array().expect("imagens do artigo");
+        assert_eq!(imagens.len(), 2);
+
+        // A capa não tem crédito escrito: quem publica leva o crédito, e nada
+        // é dito sobre licença.
+        let capa = &imagens[0];
+        assert_eq!(capa["@type"], "ImageObject");
+        assert_eq!(capa["url"], capa["contentUrl"]);
+        assert!(
+            capa["contentUrl"]
+                .as_str()
+                .is_some_and(|url| url.starts_with(&site.origem) && url.ends_with("-1200.webp"))
+        );
+        assert_eq!(capa["width"], 1200);
+        assert_eq!(capa["creditText"], site.nome);
+        for ausente in [
+            "creator",
+            "copyrightNotice",
+            "license",
+            "acquireLicensePage",
+        ] {
+            assert!(capa.get(ausente).is_none(), "{ausente}");
+        }
+
+        let do_corpo = &imagens[1];
+        assert_eq!(do_corpo["height"], 675);
+        assert_eq!(
+            do_corpo["description"],
+            "Quatro amostras de madeira com acabamentos diferentes"
+        );
+        assert_eq!(
+            do_corpo["caption"],
+            "Amostras de acabamento sobre a mesma madeira."
+        );
+        assert_eq!(do_corpo["creditText"], "Oficina Exemplo");
+        assert_eq!(
+            do_corpo["creator"],
+            json!({ "@type": "Person", "name": "Helena Prado" })
+        );
+        assert_eq!(do_corpo["copyrightNotice"], "© 2026 Oficina Exemplo");
+        assert_eq!(
+            do_corpo["license"],
+            "https://creativecommons.org/licenses/by/4.0/"
+        );
+        // Caminho do próprio site sai como endereço inteiro.
+        assert_eq!(
+            do_corpo["acquireLicensePage"],
+            format!("{}/contato", site.origem)
+        );
     }
 
     #[test]

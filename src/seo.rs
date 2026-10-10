@@ -54,6 +54,11 @@ pub fn canonica(site: &Site, caminho: &str) -> String {
     }
 }
 
+/// Página na busca, com a imagem grande e o trecho inteiro liberados: é o que
+/// a busca de imagens e o Discover pedem para mostrar a foto em destaque.
+const INDEXAR: &str =
+    "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+
 pub fn montar_cabecalho(
     documento: &Documento,
     site: &Site,
@@ -75,7 +80,7 @@ pub fn montar_cabecalho(
     nome(
         "robots",
         if seo.indexar {
-            "index, follow"
+            INDEXAR
         } else {
             "noindex, follow"
         },
@@ -250,7 +255,7 @@ mod testes {
                 href: canonica(&site, &documento.caminho)
             }]
         );
-        assert_eq!(meta(&cabecalho, "robots"), Some("index, follow"));
+        assert_eq!(meta(&cabecalho, "robots"), Some(INDEXAR));
         assert_eq!(meta(&cabecalho, "og:type"), Some("article"));
         assert_eq!(meta(&cabecalho, "og:locale"), Some("pt_BR"));
         assert_eq!(

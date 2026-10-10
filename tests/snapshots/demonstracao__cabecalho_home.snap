@@ -4,7 +4,7 @@ expression: cabecalho.para_html()
 ---
 <title>Oficina Exemplo: marcenaria sob medida em madeira maciça</title>
 <meta name="description" content="Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Oficina Exemplo: marcenaria sob medida em madeira maciça">
 <meta name="twitter:description" content="Marcenaria sob medida em Ribeirão Preto. Projeto em 3D, fabricação própria e instalação de móveis de madeira maciça.">

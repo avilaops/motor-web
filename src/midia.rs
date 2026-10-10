@@ -101,7 +101,9 @@ fn legenda(midia: &Midia) -> Option<String> {
             .filter(|t| !t.is_empty())
             .map(String::from)
     };
-    match (preenchido(&midia.legenda), preenchido(&midia.credito)) {
+    // Sem crédito escrito, quem aparece é quem fez a imagem.
+    let credito = preenchido(&midia.credito).or_else(|| preenchido(&midia.direitos.autoria));
+    match (preenchido(&midia.legenda), credito) {
         (Some(legenda), Some(credito)) => Some(format!("{legenda} Foto: {credito}")),
         (Some(legenda), None) => Some(legenda),
         (None, Some(credito)) => Some(format!("Foto: {credito}")),
@@ -112,6 +114,22 @@ fn legenda(midia: &Midia) -> Option<String> {
 #[cfg(test)]
 mod testes {
     use super::*;
+    use crate::tipos::Direitos;
+
+    #[test]
+    fn sem_credito_a_legenda_mostra_quem_fez_a_imagem() {
+        let mut midia = midia();
+        midia.direitos.autoria = Some("Helena Prado".into());
+        assert!(
+            renderizar_midia(&midia, Papel::Conteudo, "100vw")
+                .contains("<figcaption>Foto: Helena Prado</figcaption>")
+        );
+        midia.credito = Some("Oficina Exemplo".into());
+        assert!(
+            renderizar_midia(&midia, Papel::Conteudo, "100vw")
+                .contains("<figcaption>Foto: Oficina Exemplo</figcaption>")
+        );
+    }
 
     fn midia() -> Midia {
         let variante = |formato: Formato, largura: u32| Variante {
@@ -133,6 +151,7 @@ mod testes {
             ],
             legenda: None,
             credito: None,
+            direitos: Direitos::default(),
         }
     }
 

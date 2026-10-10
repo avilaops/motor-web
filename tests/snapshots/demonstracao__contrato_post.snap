@@ -152,7 +152,13 @@ expression: "serde_json::to_string_pretty(&demonstracao::post_de_exemplo()).expe
               }
             ],
             "legenda": "Amostras de acabamento sobre a mesma madeira.",
-            "credito": "Oficina Exemplo"
+            "credito": "Oficina Exemplo",
+            "direitos": {
+              "autoria": "Helena Prado",
+              "aviso": "© 2026 Oficina Exemplo",
+              "licenca": "https://creativecommons.org/licenses/by/4.0/",
+              "aquisicao": "/contato"
+            }
           }
         },
         {

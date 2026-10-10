@@ -77,6 +77,33 @@ pub struct Midia {
     pub legenda: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credito: Option<String>,
+    #[serde(default, skip_serializing_if = "Direitos::vazio")]
+    pub direitos: Direitos,
+}
+
+/// De quem é a imagem e em que termos ela pode ser usada. É o que a busca de
+/// imagens lê para mostrar o crédito e o selo de imagem licenciável.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Direitos {
+    /// Quem fez a imagem.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub autoria: Option<String>,
+    /// O aviso de direitos autorais, como "© 2026 Oficina Exemplo".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aviso: Option<String>,
+    /// O endereço da licença de uso: `https://` ou um caminho do site.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub licenca: Option<String>,
+    /// O endereço onde se pede a licença.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub aquisicao: Option<String>,
+}
+
+impl Direitos {
+    pub fn vazio(&self) -> bool {
+        *self == Self::default()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

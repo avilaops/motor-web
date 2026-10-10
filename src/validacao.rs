@@ -425,6 +425,7 @@ fn link_invalido(campo: String) -> Problema {
 }
 
 fn validar_alt(midia: &Midia, campo: &str, problemas: &mut Vec<Problema>) {
+    validar_direitos(midia, campo.trim_end_matches(".alt"), problemas);
     let alt = midia.alt.trim();
     if alt.is_empty() {
         problemas.push(Problema::bloqueia(
@@ -438,6 +439,24 @@ fn validar_alt(midia: &Midia, campo: &str, problemas: &mut Vec<Problema>) {
             campo,
             "A descrição da foto é o nome do arquivo. Descreva o que aparece na imagem.",
         ));
+    }
+}
+
+/// Licença e página de aquisição são endereços: saem no dado estruturado da
+/// imagem, e endereço quebrado ali tira o selo de imagem licenciável.
+fn validar_direitos(midia: &Midia, campo: &str, problemas: &mut Vec<Problema>) {
+    let direitos = &midia.direitos;
+    for (nome, endereco) in [
+        ("licenca", &direitos.licenca),
+        ("aquisicao", &direitos.aquisicao),
+    ] {
+        if endereco.as_deref().is_some_and(|e| !link_valido(e.trim())) {
+            problemas.push(Problema::bloqueia(
+                "midia.direitos.endereco",
+                format!("{campo}.direitos.{nome}"),
+                "O endereço da licença da imagem não é válido. Use um que comece com https:// ou um caminho do próprio site.",
+            ));
+        }
     }
 }
 
@@ -602,6 +621,20 @@ mod testes {
             validar_sem_contexto(&demonstracao::produto_de_exemplo()),
             vec![]
         );
+    }
+
+    #[test]
+    fn licenca_de_imagem_precisa_ser_endereco() {
+        let documento = com_post(|post| post.capa.direitos.licenca = Some("cc by 4.0".into()));
+        let problemas = validar_sem_contexto(&documento);
+        assert_eq!(codigos(&problemas), vec!["midia.direitos.endereco"]);
+        assert_eq!(problemas[0].campo, "capa.direitos.licenca");
+
+        let documento = com_post(|post| {
+            post.capa.direitos.licenca = Some("/licenca-de-imagens".into());
+            post.capa.direitos.aquisicao = Some("https://exemplo.example/licenca".into());
+        });
+        assert_eq!(validar_sem_contexto(&documento), vec![]);
     }
 
     #[test]
