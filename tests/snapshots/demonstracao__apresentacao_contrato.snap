@@ -1,0 +1,468 @@
+---
+source: tests/demonstracao.rs
+expression: "serde_json::to_string_pretty(&documento.conteudo).expect(\"json\")"
+---
+{
+  "especie": "pagina",
+  "dados": {
+    "slug": "apresentacao",
+    "titulo": "Móveis de madeira maciça feitos para durar",
+    "corpo": [
+      {
+        "tipo": "logos",
+        "titulo": "Quem já confiou na oficina",
+        "itens": [
+          {
+            "id": "logo-cafe-do-largo",
+            "alt": "Café do Largo",
+            "largura": 480,
+            "altura": 240,
+            "variantes": [
+              {
+                "formato": "avif",
+                "largura": 480,
+                "url": "/midia/logo-cafe-do-largo-0a1b2c3d-480.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 480,
+                "url": "/midia/logo-cafe-do-largo-0a1b2c3d-480.webp"
+              }
+            ]
+          },
+          {
+            "id": "logo-livraria-ipe",
+            "alt": "Livraria Ipê",
+            "largura": 480,
+            "altura": 240,
+            "variantes": [
+              {
+                "formato": "avif",
+                "largura": 480,
+                "url": "/midia/logo-livraria-ipe-0a1b2c3d-480.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 480,
+                "url": "/midia/logo-livraria-ipe-0a1b2c3d-480.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tipo": "cartoes",
+        "titulo": "O que fazemos",
+        "texto": "Do desenho à instalação, com madeira de origem conhecida.",
+        "itens": [
+          {
+            "titulo": "Móveis sob medida",
+            "texto": "Projetados para o espaço e para o uso de quem mora.",
+            "midia": {
+              "id": "estante-sob-medida",
+              "alt": "Estante de madeira ocupando uma parede inteira",
+              "largura": 1200,
+              "altura": 800,
+              "variantes": [
+                {
+                  "formato": "avif",
+                  "largura": 480,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-480.avif"
+                },
+                {
+                  "formato": "webp",
+                  "largura": 480,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-480.webp"
+                },
+                {
+                  "formato": "avif",
+                  "largura": 768,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-768.avif"
+                },
+                {
+                  "formato": "webp",
+                  "largura": 768,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-768.webp"
+                },
+                {
+                  "formato": "avif",
+                  "largura": 1200,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-1200.avif"
+                },
+                {
+                  "formato": "webp",
+                  "largura": 1200,
+                  "url": "/midia/estante-sob-medida-0a1b2c3d-1200.webp"
+                }
+              ]
+            },
+            "acao": {
+              "rotulo": "Saiba mais",
+              "url": "/servicos"
+            }
+          },
+          {
+            "titulo": "Restauro",
+            "texto": "Peças de família recuperadas sem perder a história.",
+            "acao": {
+              "rotulo": "Saiba mais",
+              "url": "/servicos"
+            }
+          }
+        ]
+      },
+      {
+        "tipo": "destaque",
+        "titulo": "Madeira com procedência",
+        "texto": "Toda tábua chega com nota e origem.\n\nVocê recebe o registro junto com o móvel.",
+        "midia": {
+          "id": "tabuas-empilhadas",
+          "alt": "Tábuas de madeira empilhadas na oficina",
+          "largura": 1600,
+          "altura": 1067,
+          "variantes": [
+            {
+              "formato": "avif",
+              "largura": 480,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-480.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 480,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-480.webp"
+            },
+            {
+              "formato": "avif",
+              "largura": 768,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-768.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 768,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-768.webp"
+            },
+            {
+              "formato": "avif",
+              "largura": 1200,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-1200.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 1200,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-1200.webp"
+            },
+            {
+              "formato": "avif",
+              "largura": 1600,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-1600.avif"
+            },
+            {
+              "formato": "webp",
+              "largura": 1600,
+              "url": "/midia/tabuas-empilhadas-0a1b2c3d-1600.webp"
+            }
+          ]
+        },
+        "invertido": true,
+        "acao": {
+          "rotulo": "Conheça a oficina",
+          "url": "/sobre"
+        }
+      },
+      {
+        "tipo": "numeros",
+        "titulo": "Em números",
+        "itens": [
+          {
+            "valor": "15 anos",
+            "rotulo": "de oficina"
+          },
+          {
+            "valor": "1.200",
+            "rotulo": "peças entregues"
+          }
+        ]
+      },
+      {
+        "tipo": "passos",
+        "titulo": "Como funciona",
+        "itens": [
+          {
+            "titulo": "Visita técnica",
+            "texto": "Medimos o espaço e ouvimos o que você precisa."
+          },
+          {
+            "titulo": "Projeto",
+            "texto": "Você aprova o desenho antes de qualquer corte."
+          }
+        ]
+      },
+      {
+        "tipo": "depoimentos",
+        "titulo": "O que dizem os clientes",
+        "itens": [
+          {
+            "texto": "A estante ficou melhor do que o desenho.",
+            "autor": "Marina Teles",
+            "cargo": "Ribeirão Preto",
+            "foto": {
+              "id": "marina-teles",
+              "alt": "Retrato de Marina Teles sorrindo",
+              "largura": 400,
+              "altura": 400,
+              "variantes": [
+                {
+                  "formato": "avif",
+                  "largura": 400,
+                  "url": "/midia/marina-teles-0a1b2c3d-400.avif"
+                },
+                {
+                  "formato": "webp",
+                  "largura": 400,
+                  "url": "/midia/marina-teles-0a1b2c3d-400.webp"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "tipo": "planos",
+        "titulo": "Formas de contratar",
+        "itens": [
+          {
+            "nome": "Peça única",
+            "preco": "A partir de R$ 1.800",
+            "periodo": "por projeto",
+            "descricao": "Inclui visita técnica e desenho.",
+            "itens": [
+              "Um móvel",
+              "Entrega em 30 dias"
+            ],
+            "acao": {
+              "rotulo": "Pedir orçamento",
+              "url": "/contato"
+            }
+          },
+          {
+            "nome": "Ambiente completo",
+            "preco": "Sob consulta",
+            "periodo": "por projeto",
+            "descricao": "Inclui visita técnica e desenho.",
+            "itens": [
+              "Vários móveis",
+              "Instalação incluída"
+            ],
+            "acao": {
+              "rotulo": "Pedir orçamento",
+              "url": "/contato"
+            },
+            "destaque": true
+          }
+        ]
+      },
+      {
+        "tipo": "galeria",
+        "titulo": "Trabalhos recentes",
+        "itens": [
+          {
+            "id": "aparador-de-freijo",
+            "alt": "Aparador de freijó em uma sala de jantar",
+            "largura": 1600,
+            "altura": 1200,
+            "variantes": [
+              {
+                "formato": "avif",
+                "largura": 480,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-480.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 480,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-480.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 768,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-768.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 768,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-768.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1200,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-1200.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1200,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-1200.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1600,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-1600.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1600,
+                "url": "/midia/aparador-de-freijo-0a1b2c3d-1600.webp"
+              }
+            ]
+          },
+          {
+            "id": "mesa-redonda",
+            "alt": "Mesa redonda de madeira com quatro cadeiras",
+            "largura": 1600,
+            "altura": 1200,
+            "variantes": [
+              {
+                "formato": "avif",
+                "largura": 480,
+                "url": "/midia/mesa-redonda-0a1b2c3d-480.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 480,
+                "url": "/midia/mesa-redonda-0a1b2c3d-480.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 768,
+                "url": "/midia/mesa-redonda-0a1b2c3d-768.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 768,
+                "url": "/midia/mesa-redonda-0a1b2c3d-768.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1200,
+                "url": "/midia/mesa-redonda-0a1b2c3d-1200.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1200,
+                "url": "/midia/mesa-redonda-0a1b2c3d-1200.webp"
+              },
+              {
+                "formato": "avif",
+                "largura": 1600,
+                "url": "/midia/mesa-redonda-0a1b2c3d-1600.avif"
+              },
+              {
+                "formato": "webp",
+                "largura": 1600,
+                "url": "/midia/mesa-redonda-0a1b2c3d-1600.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tipo": "contato",
+        "titulo": "Fale com a oficina",
+        "texto": "Respondemos em até um dia útil.",
+        "telefone": "(16) 5550-0100",
+        "whatsapp": "(16) 95550-0100",
+        "email": "contato@oficina-exemplo.example",
+        "endereco": "Rua das Acácias, 100, Ribeirão Preto - SP",
+        "horario": "Segunda a sexta, das 8h às 18h"
+      },
+      {
+        "tipo": "faixa",
+        "titulo": "Vamos desenhar o seu móvel?",
+        "texto": "A visita técnica é sem compromisso.",
+        "acoes": [
+          {
+            "rotulo": "Agendar visita",
+            "url": "/contato"
+          }
+        ]
+      }
+    ],
+    "capa": {
+      "id": "oficina-vista-geral",
+      "alt": "Bancada da oficina com um móvel em montagem",
+      "largura": 1920,
+      "altura": 1280,
+      "variantes": [
+        {
+          "formato": "avif",
+          "largura": 480,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-480.avif"
+        },
+        {
+          "formato": "webp",
+          "largura": 480,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-480.webp"
+        },
+        {
+          "formato": "avif",
+          "largura": 768,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-768.avif"
+        },
+        {
+          "formato": "webp",
+          "largura": 768,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-768.webp"
+        },
+        {
+          "formato": "avif",
+          "largura": 1200,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-1200.avif"
+        },
+        {
+          "formato": "webp",
+          "largura": 1200,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-1200.webp"
+        },
+        {
+          "formato": "avif",
+          "largura": 1920,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-1920.avif"
+        },
+        {
+          "formato": "webp",
+          "largura": 1920,
+          "url": "/midia/oficina-vista-geral-0a1b2c3d-1920.webp"
+        }
+      ]
+    },
+    "abertura": {
+      "sobretitulo": "Marcenaria sob medida",
+      "texto": "Projetamos, fabricamos e instalamos móveis que atravessam gerações.",
+      "acoes": [
+        {
+          "rotulo": "Pedir orçamento",
+          "url": "/contato"
+        },
+        {
+          "rotulo": "Ver serviços",
+          "url": "/servicos"
+        }
+      ]
+    },
+    "publicadoEm": "2026-07-01T12:00:00Z",
+    "atualizadoEm": "2026-09-15T12:00:00Z",
+    "seo": {
+      "titulo": "Marcenaria sob medida em Ribeirão Preto | Oficina Exemplo",
+      "descricao": "Móveis de madeira maciça sob medida, do projeto à instalação. Conheça o trabalho da Oficina Exemplo e peça uma visita técnica.",
+      "indexar": true
+    },
+    "trilha": [
+      {
+        "nome": "Início",
+        "url": "/"
+      },
+      {
+        "nome": "Móveis de madeira maciça feitos para durar",
+        "url": "/apresentacao"
+      }
+    ]
+  }
+}

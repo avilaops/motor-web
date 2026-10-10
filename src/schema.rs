@@ -98,10 +98,7 @@ fn imagens_ld<'a>(
     corpo: &'a [Bloco],
     site: &Site,
 ) -> Vec<Value> {
-    let do_corpo = corpo.iter().filter_map(|bloco| match bloco {
-        Bloco::Imagem { midia } => Some(midia),
-        _ => None,
-    });
+    let do_corpo = corpo.iter().flat_map(Bloco::midias);
     capa.into_iter()
         .chain(do_corpo)
         .filter_map(|midia| imagem_ld(midia, site))

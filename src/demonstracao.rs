@@ -6,9 +6,9 @@ use chrono::{DateTime, NaiveDate, Utc};
 
 use crate::descoberta::PaginaDeCategoria;
 use crate::tipos::{
-    Autor, Avaliacoes, Bloco, Categoria, Conteudo, Direitos, Disponibilidade, Documento, Endereco,
-    Formato, ItemTrilha, Midia, Organizacao, Pagina, Pergunta, Post, Product, Seo, Site, TipoPost,
-    Trecho, Variacao, Variante,
+    Abertura, Acao, Autor, Avaliacoes, Bloco, Cartao, Categoria, Conteudo, Depoimento, Direitos,
+    Disponibilidade, Documento, Endereco, Formato, ItemTrilha, Midia, Numero, Organizacao, Pagina,
+    Passo, Pergunta, Plano, Post, Product, Seo, Site, TipoPost, Trecho, Variacao, Variante,
 };
 
 const ORIGEM: &str = "https://oficina-exemplo.example";
@@ -342,6 +342,7 @@ fn pagina(
             titulo: titulo_da_pagina.into(),
             corpo,
             capa,
+            abertura: None,
             publicado_em: dia(2026, 7, 1),
             atualizado_em: dia(2026, 9, 15),
             seo: seo(busca.0, busca.1),
@@ -349,6 +350,185 @@ fn pagina(
         }),
         caminho,
     }
+}
+
+fn acao(rotulo: &str, url: &str) -> Acao {
+    Acao {
+        rotulo: rotulo.into(),
+        url: url.into(),
+    }
+}
+
+/// Uma página de apresentação com a abertura e todas as seções. Fica fora de
+/// `documentos()`: serve de referência do contrato e de teste do leiaute largo.
+pub fn apresentacao() -> Documento {
+    let cartao = |titulo: &str, texto: &str, imagem: Option<(&str, &str)>| Cartao {
+        titulo: titulo.into(),
+        texto: texto.into(),
+        midia: imagem.map(|(nome, alt)| midia(nome, alt, 1200, 800)),
+        acao: Some(acao("Saiba mais", "/servicos")),
+    };
+    let plano = |nome: &str, preco: &str, destaque: bool, itens: &[&str]| Plano {
+        nome: nome.into(),
+        preco: preco.into(),
+        periodo: Some("por projeto".into()),
+        descricao: Some("Inclui visita técnica e desenho.".into()),
+        itens: itens.iter().map(|item| (*item).into()).collect(),
+        acao: acao("Pedir orçamento", "/contato"),
+        destaque,
+    };
+    let corpo =
+        vec![
+        Bloco::Logos {
+            titulo: Some("Quem já confiou na oficina".into()),
+            itens: vec![
+                midia("logo-cafe-do-largo", "Café do Largo", 480, 240),
+                midia("logo-livraria-ipe", "Livraria Ipê", 480, 240),
+            ],
+        },
+        Bloco::Cartoes {
+            titulo: Some("O que fazemos".into()),
+            texto: Some("Do desenho à instalação, com madeira de origem conhecida.".into()),
+            itens: vec![
+                cartao(
+                    "Móveis sob medida",
+                    "Projetados para o espaço e para o uso de quem mora.",
+                    Some((
+                        "estante-sob-medida",
+                        "Estante de madeira ocupando uma parede inteira",
+                    )),
+                ),
+                cartao(
+                    "Restauro",
+                    "Peças de família recuperadas sem perder a história.",
+                    None,
+                ),
+            ],
+        },
+        Bloco::Destaque {
+            titulo: "Madeira com procedência".into(),
+            texto:
+                "Toda tábua chega com nota e origem.\n\nVocê recebe o registro junto com o móvel."
+                    .into(),
+            midia: midia(
+                "tabuas-empilhadas",
+                "Tábuas de madeira empilhadas na oficina",
+                1600,
+                1067,
+            ),
+            invertido: true,
+            acao: Some(acao("Conheça a oficina", "/sobre")),
+        },
+        Bloco::Numeros {
+            titulo: Some("Em números".into()),
+            itens: vec![
+                Numero {
+                    valor: "15 anos".into(),
+                    rotulo: "de oficina".into(),
+                },
+                Numero {
+                    valor: "1.200".into(),
+                    rotulo: "peças entregues".into(),
+                },
+            ],
+        },
+        Bloco::Passos {
+            titulo: Some("Como funciona".into()),
+            itens: vec![
+                Passo {
+                    titulo: "Visita técnica".into(),
+                    texto: "Medimos o espaço e ouvimos o que você precisa.".into(),
+                },
+                Passo {
+                    titulo: "Projeto".into(),
+                    texto: "Você aprova o desenho antes de qualquer corte.".into(),
+                },
+            ],
+        },
+        Bloco::Depoimentos {
+            titulo: Some("O que dizem os clientes".into()),
+            itens: vec![Depoimento {
+                texto: "A estante ficou melhor do que o desenho.".into(),
+                autor: "Marina Teles".into(),
+                cargo: Some("Ribeirão Preto".into()),
+                foto: Some(midia("marina-teles", "Retrato de Marina Teles sorrindo", 400, 400)),
+            }],
+        },
+        Bloco::Planos {
+            titulo: Some("Formas de contratar".into()),
+            itens: vec![
+                plano(
+                    "Peça única",
+                    "A partir de R$ 1.800",
+                    false,
+                    &["Um móvel", "Entrega em 30 dias"],
+                ),
+                plano(
+                    "Ambiente completo",
+                    "Sob consulta",
+                    true,
+                    &["Vários móveis", "Instalação incluída"],
+                ),
+            ],
+        },
+        Bloco::Galeria {
+            titulo: Some("Trabalhos recentes".into()),
+            itens: vec![
+                midia(
+                    "aparador-de-freijo",
+                    "Aparador de freijó em uma sala de jantar",
+                    1600,
+                    1200,
+                ),
+                midia(
+                    "mesa-redonda",
+                    "Mesa redonda de madeira com quatro cadeiras",
+                    1600,
+                    1200,
+                ),
+            ],
+        },
+        Bloco::Contato {
+            titulo: Some("Fale com a oficina".into()),
+            texto: Some("Respondemos em até um dia útil.".into()),
+            telefone: Some("(16) 5550-0100".into()),
+            whatsapp: Some("(16) 95550-0100".into()),
+            email: Some("contato@oficina-exemplo.example".into()),
+            endereco: Some("Rua das Acácias, 100, Ribeirão Preto - SP".into()),
+            horario: Some("Segunda a sexta, das 8h às 18h".into()),
+        },
+        Bloco::Faixa {
+            titulo: "Vamos desenhar o seu móvel?".into(),
+            texto: Some("A visita técnica é sem compromisso.".into()),
+            acoes: vec![acao("Agendar visita", "/contato")],
+        },
+    ];
+    let mut documento = pagina(
+        "apresentacao",
+        "Móveis de madeira maciça feitos para durar",
+        corpo,
+        Some(midia(
+            "oficina-vista-geral",
+            "Bancada da oficina com um móvel em montagem",
+            1920,
+            1280,
+        )),
+        (
+            "Marcenaria sob medida em Ribeirão Preto | Oficina Exemplo",
+            "Móveis de madeira maciça sob medida, do projeto à instalação. Conheça o trabalho da Oficina Exemplo e peça uma visita técnica.",
+        ),
+    );
+    if let Conteudo::Pagina(pagina) = &mut documento.conteudo {
+        pagina.abertura = Some(Abertura {
+            sobretitulo: Some("Marcenaria sob medida".into()),
+            texto: "Projetamos, fabricamos e instalamos móveis que atravessam gerações.".into(),
+            acoes: vec![
+                acao("Pedir orçamento", "/contato"),
+                acao("Ver serviços", "/servicos"),
+            ],
+        });
+    }
+    documento
 }
 
 /// O site inteiro: home, três páginas, cinco posts e dois produtos. A home é

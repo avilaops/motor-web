@@ -252,3 +252,30 @@ fn pagina_montada_tem_um_h1_uma_imagem_prioritaria_e_dimensoes_em_todas() {
         }
     }
 }
+
+#[test]
+fn pagina_de_apresentacao_sai_com_abertura_e_todas_as_secoes() {
+    let documento = demonstracao::apresentacao();
+    assert!(documento.eh_larga());
+    assert_eq!(validar(&documento, &Contexto::vazio()), vec![]);
+    let Conteudo::Pagina(pagina) = &documento.conteudo else {
+        panic!("a apresentação é uma página");
+    };
+    let html = format!(
+        "{}\n{}",
+        motor_web::secoes::renderizar_abertura(pagina).expect("abertura"),
+        renderizar_corpo(&pagina.corpo)
+    );
+    assert_eq!(html.matches("<h1>").count(), 1);
+    insta::assert_snapshot!("apresentacao_html", html);
+    insta::assert_snapshot!(
+        "apresentacao_contrato",
+        serde_json::to_string_pretty(&documento.conteudo).expect("json")
+    );
+    // Página de texto corrido continua no leiaute de leitura.
+    assert!(!documento_de_texto().eh_larga());
+}
+
+fn documento_de_texto() -> Documento {
+    documento("/sobre")
+}

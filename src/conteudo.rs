@@ -2,6 +2,7 @@
 
 use crate::escape::{marcacao, uma_linha};
 use crate::midia::{Papel, renderizar_midia, url_principal};
+use crate::secoes;
 use crate::tipos::{Bloco, Trecho};
 use crate::url::{incorporacao_de_video, link_valido};
 
@@ -98,6 +99,16 @@ fn renderizar_bloco(bloco: &Bloco) -> String {
                 marcacao(texto)
             )
         }
+        Bloco::Cartoes { .. }
+        | Bloco::Destaque { .. }
+        | Bloco::Depoimentos { .. }
+        | Bloco::Numeros { .. }
+        | Bloco::Passos { .. }
+        | Bloco::Planos { .. }
+        | Bloco::Galeria { .. }
+        | Bloco::Logos { .. }
+        | Bloco::Faixa { .. }
+        | Bloco::Contato { .. } => secoes::renderizar(bloco),
     }
 }
 
@@ -192,6 +203,16 @@ fn texto_do_bloco(bloco: &Bloco) -> String {
         Bloco::Chamada { texto, rotulo, url } => {
             format!("{} [{}]({url})", uma_linha(texto), uma_linha(rotulo))
         }
+        Bloco::Cartoes { .. }
+        | Bloco::Destaque { .. }
+        | Bloco::Depoimentos { .. }
+        | Bloco::Numeros { .. }
+        | Bloco::Passos { .. }
+        | Bloco::Planos { .. }
+        | Bloco::Galeria { .. }
+        | Bloco::Logos { .. }
+        | Bloco::Faixa { .. }
+        | Bloco::Contato { .. } => secoes::em_markdown(bloco),
     }
 }
 
@@ -225,6 +246,16 @@ pub fn contar_palavras(blocos: &[Bloco]) -> usize {
                 .map(|i| palavras(&i.pergunta) + palavras(&i.resposta))
                 .sum(),
             Bloco::Imagem { .. } | Bloco::Video { .. } => 0,
+            Bloco::Cartoes { .. }
+            | Bloco::Destaque { .. }
+            | Bloco::Depoimentos { .. }
+            | Bloco::Numeros { .. }
+            | Bloco::Passos { .. }
+            | Bloco::Planos { .. }
+            | Bloco::Galeria { .. }
+            | Bloco::Logos { .. }
+            | Bloco::Faixa { .. }
+            | Bloco::Contato { .. } => palavras(&secoes::em_markdown(bloco)),
         })
         .sum()
 }

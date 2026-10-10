@@ -12,6 +12,7 @@ pub mod descoberta;
 pub mod imagem;
 pub mod midia;
 pub mod schema;
+pub mod secoes;
 pub mod seo;
 pub mod tipos;
 pub mod validacao;

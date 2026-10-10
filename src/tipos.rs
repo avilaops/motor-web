@@ -185,11 +185,36 @@ pub struct Pagina {
     pub corpo: Vec<Bloco>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub capa: Option<Midia>,
+    /// O topo de uma página de apresentação: o título ganha chamada, texto e
+    /// botões, e a capa vira a imagem ao lado.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub abertura: Option<Abertura>,
     pub publicado_em: DateTime<Utc>,
     pub atualizado_em: DateTime<Utc>,
     pub seo: Seo,
     #[serde(default)]
     pub trilha: Vec<ItemTrilha>,
+}
+
+/// O que acompanha o `<h1>` no topo de uma página de apresentação.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Abertura {
+    /// A linha curta acima do título.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sobretitulo: Option<String>,
+    pub texto: String,
+    /// Até dois botões; o primeiro é o principal.
+    #[serde(default)]
+    pub acoes: Vec<Acao>,
+}
+
+/// Um botão: o que está escrito e para onde leva.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Acao {
+    pub rotulo: String,
+    pub url: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -271,8 +296,8 @@ pub struct Avaliacoes {
     pub total: u32,
 }
 
-/// O corpo é uma lista de blocos tipados. Não existe HTML livre, e o `<h1>`
-/// não é bloco: sai do título do documento.
+/// O corpo é uma lista de blocos tipados: os de texto corrido e as seções.
+/// Não existe HTML livre, e o `<h1>` não é bloco: sai do título do documento.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(
     tag = "tipo",
@@ -318,6 +343,188 @@ pub enum Bloco {
         rotulo: String,
         url: String,
     },
+    // Daqui para baixo, as seções: faixas de página inteira, com título de
+    // nível 2 próprio. Uma página com seção sai no leiaute largo.
+    /// Grade de cartões: serviços, recursos, diferenciais.
+    Cartoes {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        texto: Option<String>,
+        itens: Vec<Cartao>,
+    },
+    /// Imagem de um lado e texto do outro.
+    Destaque {
+        titulo: String,
+        texto: String,
+        midia: Midia,
+        /// A imagem vai para a direita.
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        invertido: bool,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        acao: Option<Acao>,
+    },
+    Depoimentos {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Depoimento>,
+    },
+    /// Números de destaque: "15 anos", "1.200 clientes".
+    Numeros {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Numero>,
+    },
+    /// Como funciona, em etapas numeradas.
+    Passos {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Passo>,
+    },
+    /// Planos e preços, lado a lado.
+    Planos {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Plano>,
+    },
+    Galeria {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Midia>,
+    },
+    /// Marcas de clientes ou parceiros, em linha.
+    Logos {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        itens: Vec<Midia>,
+    },
+    /// Faixa de chamada no fim de uma página: título, texto e botões.
+    Faixa {
+        titulo: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        texto: Option<String>,
+        acoes: Vec<Acao>,
+    },
+    /// Como falar com o negócio. Pelo menos um canal.
+    Contato {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        texto: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        telefone: Option<String>,
+        /// O número com DDD; o link sai com o código do Brasil.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        whatsapp: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        email: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        endereco: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        horario: Option<String>,
+    },
+}
+
+impl Bloco {
+    /// Seção ocupa a largura da página; os outros blocos são texto corrido.
+    pub fn eh_secao(&self) -> bool {
+        !matches!(
+            self,
+            Bloco::Paragrafo { .. }
+                | Bloco::Titulo { .. }
+                | Bloco::Imagem { .. }
+                | Bloco::Lista { .. }
+                | Bloco::Citacao { .. }
+                | Bloco::Tabela { .. }
+                | Bloco::Perguntas { .. }
+                | Bloco::Video { .. }
+                | Bloco::Chamada { .. }
+        )
+    }
+
+    /// As imagens do bloco, na ordem em que aparecem.
+    pub fn midias(&self) -> Vec<&Midia> {
+        match self {
+            Bloco::Imagem { midia } | Bloco::Destaque { midia, .. } => vec![midia],
+            Bloco::Cartoes { itens, .. } => itens.iter().filter_map(|i| i.midia.as_ref()).collect(),
+            Bloco::Depoimentos { itens, .. } => {
+                itens.iter().filter_map(|i| i.foto.as_ref()).collect()
+            }
+            Bloco::Galeria { itens, .. } | Bloco::Logos { itens, .. } => itens.iter().collect(),
+            _ => Vec::new(),
+        }
+    }
+
+    pub fn midias_mut(&mut self) -> Vec<&mut Midia> {
+        match self {
+            Bloco::Imagem { midia } | Bloco::Destaque { midia, .. } => vec![midia],
+            Bloco::Cartoes { itens, .. } => {
+                itens.iter_mut().filter_map(|i| i.midia.as_mut()).collect()
+            }
+            Bloco::Depoimentos { itens, .. } => {
+                itens.iter_mut().filter_map(|i| i.foto.as_mut()).collect()
+            }
+            Bloco::Galeria { itens, .. } | Bloco::Logos { itens, .. } => itens.iter_mut().collect(),
+            _ => Vec::new(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Cartao {
+    pub titulo: String,
+    pub texto: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub midia: Option<Midia>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub acao: Option<Acao>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Depoimento {
+    pub texto: String,
+    pub autor: String,
+    /// Cargo, empresa ou cidade de quem falou.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cargo: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub foto: Option<Midia>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Numero {
+    pub valor: String,
+    pub rotulo: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Passo {
+    pub titulo: String,
+    pub texto: String,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Plano {
+    pub nome: String,
+    /// Como aparece: "R$ 350" ou "Sob consulta".
+    pub preco: String,
+    /// "por mês", "por projeto".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub periodo: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub descricao: Option<String>,
+    /// O que o plano inclui.
+    #[serde(default)]
+    pub itens: Vec<String>,
+    pub acao: Acao,
+    /// O plano recomendado, que sai realçado.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub destaque: bool,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -425,12 +632,16 @@ impl Documento {
             Conteudo::Produto(p) => p.imagens.iter().collect(),
             _ => self.capa().into_iter().collect(),
         };
-        for bloco in self.corpo() {
-            if let Bloco::Imagem { midia } = bloco {
-                midias.push(midia);
-            }
-        }
+        midias.extend(self.corpo().iter().flat_map(Bloco::midias));
         midias
+    }
+
+    /// Página de apresentação: tem abertura ou alguma seção, e sai no
+    /// leiaute largo.
+    pub fn eh_larga(&self) -> bool {
+        let com_abertura =
+            matches!(&self.conteudo, Conteudo::Pagina(pagina) if pagina.abertura.is_some());
+        com_abertura || self.corpo().iter().any(Bloco::eh_secao)
     }
 
     pub fn eh_home(&self) -> bool {

@@ -11,7 +11,8 @@ use unicode_normalization::UnicodeNormalization;
 use unicode_normalization::char::is_combining_mark;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::tipos::{Bloco, Conteudo, Documento, Midia};
+use crate::secoes::email_valido;
+use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia};
 use crate::url::{incorporacao_de_video, link_valido};
 
 pub const TITULO_RECOMENDADO: usize = 60;
@@ -164,6 +165,9 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
         Conteudo::Pagina(pagina) => {
             if let Some(capa) = &pagina.capa {
                 validar_alt(capa, "capa.alt", &mut problemas);
+            }
+            if let Some(abertura) = &pagina.abertura {
+                validar_abertura(abertura, &mut problemas);
             }
         }
         Conteudo::Post(post) => {
@@ -412,7 +416,204 @@ fn validar_corpo(blocos: &[Bloco], problemas: &mut Vec<Problema>) {
             | Bloco::Citacao { .. }
             | Bloco::Tabela { .. }
             | Bloco::Perguntas { .. } => {}
+            secao => {
+                // O título da seção é de nível 2, e o de cada item, 3.
+                if let Some(nivel) = validar_secao(secao, &format!("corpo[{i}]"), problemas) {
+                    nivel_anterior = nivel;
+                }
+            }
         }
+    }
+}
+
+fn texto_faltando(campo: String) -> Problema {
+    Problema::bloqueia(
+        "secao.texto.vazio",
+        campo,
+        "Falta preencher um texto desta seção.",
+    )
+}
+
+fn validar_acao(acao: &Acao, campo: &str, problemas: &mut Vec<Problema>) {
+    if acao.rotulo.trim().is_empty() {
+        problemas.push(texto_faltando(format!("{campo}.rotulo")));
+    }
+    if !link_valido(&acao.url) {
+        problemas.push(link_invalido(format!("{campo}.url")));
+    }
+}
+
+/// Imagem obrigatória de uma seção: tem de ter sido escolhida e descrita.
+fn validar_imagem_da_secao(midia: &Midia, campo: &str, problemas: &mut Vec<Problema>) {
+    if midia.id.trim().is_empty() {
+        problemas.push(Problema::bloqueia(
+            "secao.imagem.falta",
+            campo,
+            "Escolha a imagem desta seção.",
+        ));
+    } else {
+        validar_alt(midia, &format!("{campo}.alt"), problemas);
+    }
+}
+
+/// Confere uma seção e devolve o nível do último título que ela gera, ou
+/// `None` quando o bloco não é seção ou não gera título.
+fn validar_secao(bloco: &Bloco, campo: &str, problemas: &mut Vec<Problema>) -> Option<u8> {
+    let preenchido =
+        |texto: &Option<String>| texto.as_deref().is_some_and(|t| !t.trim().is_empty());
+    let exigir = |texto: &str, nome: String, problemas: &mut Vec<Problema>| {
+        if texto.trim().is_empty() {
+            problemas.push(texto_faltando(format!("{campo}.{nome}")));
+        }
+    };
+    // Sem item, a seção sairia como uma faixa vazia.
+    let (tem_titulo, itens, titulo_nos_itens) = match bloco {
+        Bloco::Cartoes { titulo, itens, .. } => {
+            for (j, item) in itens.iter().enumerate() {
+                exigir(&item.titulo, format!("itens[{j}].titulo"), problemas);
+                exigir(&item.texto, format!("itens[{j}].texto"), problemas);
+                if let Some(midia) = &item.midia {
+                    validar_imagem_da_secao(midia, &format!("{campo}.itens[{j}].midia"), problemas);
+                }
+                if let Some(acao) = &item.acao {
+                    validar_acao(acao, &format!("{campo}.itens[{j}].acao"), problemas);
+                }
+            }
+            (preenchido(titulo), itens.len(), true)
+        }
+        Bloco::Destaque {
+            titulo,
+            texto,
+            midia,
+            acao,
+            ..
+        } => {
+            exigir(titulo, "titulo".into(), problemas);
+            exigir(texto, "texto".into(), problemas);
+            validar_imagem_da_secao(midia, &format!("{campo}.midia"), problemas);
+            if let Some(acao) = acao {
+                validar_acao(acao, &format!("{campo}.acao"), problemas);
+            }
+            (true, 1, false)
+        }
+        Bloco::Depoimentos { titulo, itens } => {
+            for (j, item) in itens.iter().enumerate() {
+                exigir(&item.texto, format!("itens[{j}].texto"), problemas);
+                exigir(&item.autor, format!("itens[{j}].autor"), problemas);
+                if let Some(foto) = &item.foto {
+                    validar_imagem_da_secao(foto, &format!("{campo}.itens[{j}].foto"), problemas);
+                }
+            }
+            (preenchido(titulo), itens.len(), false)
+        }
+        Bloco::Numeros { titulo, itens } => {
+            for (j, item) in itens.iter().enumerate() {
+                exigir(&item.valor, format!("itens[{j}].valor"), problemas);
+                exigir(&item.rotulo, format!("itens[{j}].rotulo"), problemas);
+            }
+            (preenchido(titulo), itens.len(), false)
+        }
+        Bloco::Passos { titulo, itens } => {
+            for (j, item) in itens.iter().enumerate() {
+                exigir(&item.titulo, format!("itens[{j}].titulo"), problemas);
+                exigir(&item.texto, format!("itens[{j}].texto"), problemas);
+            }
+            (preenchido(titulo), itens.len(), true)
+        }
+        Bloco::Planos { titulo, itens } => {
+            for (j, plano) in itens.iter().enumerate() {
+                exigir(&plano.nome, format!("itens[{j}].nome"), problemas);
+                exigir(&plano.preco, format!("itens[{j}].preco"), problemas);
+                validar_acao(&plano.acao, &format!("{campo}.itens[{j}].acao"), problemas);
+            }
+            (preenchido(titulo), itens.len(), true)
+        }
+        Bloco::Galeria { titulo, itens } | Bloco::Logos { titulo, itens } => {
+            for (j, midia) in itens.iter().enumerate() {
+                validar_imagem_da_secao(midia, &format!("{campo}.itens[{j}]"), problemas);
+            }
+            (preenchido(titulo), itens.len(), false)
+        }
+        Bloco::Faixa { titulo, acoes, .. } => {
+            exigir(titulo, "titulo".into(), problemas);
+            for (j, acao) in acoes.iter().enumerate() {
+                validar_acao(acao, &format!("{campo}.acoes[{j}]"), problemas);
+            }
+            if acoes.len() > MAXIMO_DE_BOTOES {
+                problemas.push(botoes_demais(format!("{campo}.acoes")));
+            }
+            (true, acoes.len(), false)
+        }
+        Bloco::Contato {
+            titulo,
+            telefone,
+            whatsapp,
+            email,
+            endereco,
+            ..
+        } => {
+            if email
+                .as_deref()
+                .is_some_and(|e| !e.trim().is_empty() && !email_valido(e))
+            {
+                problemas.push(Problema::bloqueia(
+                    "contato.email",
+                    format!("{campo}.email"),
+                    "O e-mail de contato não parece um endereço de e-mail.",
+                ));
+            }
+            let canais = [telefone, whatsapp, email, endereco]
+                .into_iter()
+                .filter(|canal| preenchido(canal))
+                .count();
+            (preenchido(titulo), canais, false)
+        }
+        _ => return None,
+    };
+    if itens == 0 {
+        problemas.push(Problema::bloqueia(
+            "secao.vazia",
+            format!("{campo}.itens"),
+            "Esta seção está vazia. Preencha pelo menos um item ou remova a seção.",
+        ));
+    }
+    match (tem_titulo, titulo_nos_itens && itens > 0) {
+        (true, true) => Some(3),
+        (true, false) => Some(2),
+        // Sem título de seção, o dos itens sairia solto no nível 3.
+        (false, true) => {
+            problemas.push(Problema::bloqueia(
+                "secao.titulo.vazio",
+                format!("{campo}.titulo"),
+                "Dê um título a esta seção: os itens dela têm título, e ele precisa vir abaixo de um.",
+            ));
+            None
+        }
+        (false, false) => None,
+    }
+}
+
+/// Mais de dois botões lado a lado, e nenhum é o principal.
+const MAXIMO_DE_BOTOES: usize = 2;
+
+fn botoes_demais(campo: String) -> Problema {
+    Problema::bloqueia(
+        "secao.botoes",
+        campo,
+        "Use no máximo dois botões: o principal e um secundário.",
+    )
+}
+
+/// A abertura de uma página de apresentação.
+fn validar_abertura(abertura: &Abertura, problemas: &mut Vec<Problema>) {
+    if abertura.texto.trim().is_empty() {
+        problemas.push(texto_faltando("abertura.texto".into()));
+    }
+    for (j, acao) in abertura.acoes.iter().enumerate() {
+        validar_acao(acao, &format!("abertura.acoes[{j}]"), problemas);
+    }
+    if abertura.acoes.len() > MAXIMO_DE_BOTOES {
+        problemas.push(botoes_demais("abertura.acoes".into()));
     }
 }
 
@@ -621,6 +822,115 @@ mod testes {
             validar_sem_contexto(&demonstracao::produto_de_exemplo()),
             vec![]
         );
+    }
+
+    fn com_apresentacao(altera: impl FnOnce(&mut crate::tipos::Pagina)) -> Vec<Problema> {
+        let mut documento = demonstracao::apresentacao();
+        if let Conteudo::Pagina(pagina) = &mut documento.conteudo {
+            altera(pagina);
+        }
+        validar_sem_contexto(&documento)
+    }
+
+    #[test]
+    fn pagina_de_apresentacao_passa_limpa() {
+        assert_eq!(com_apresentacao(|_| {}), vec![]);
+    }
+
+    #[test]
+    fn secao_vazia_ou_incompleta_nao_vai_ao_ar() {
+        use crate::tipos::{Acao, Cartao, Midia};
+
+        let problemas = com_apresentacao(|pagina| {
+            pagina.corpo = vec![
+                Bloco::Numeros {
+                    titulo: None,
+                    itens: vec![],
+                },
+                Bloco::Cartoes {
+                    titulo: None,
+                    texto: None,
+                    itens: vec![Cartao {
+                        titulo: "Restauro".into(),
+                        texto: " ".into(),
+                        midia: None,
+                        acao: Some(Acao {
+                            rotulo: "Ver".into(),
+                            url: "javascript:alert(1)".into(),
+                        }),
+                    }],
+                },
+                Bloco::Destaque {
+                    titulo: "Madeira".into(),
+                    texto: "Com procedência.".into(),
+                    midia: Midia {
+                        id: String::new(),
+                        alt: String::new(),
+                        largura: 0,
+                        altura: 0,
+                        variantes: vec![],
+                        legenda: None,
+                        credito: None,
+                        direitos: Default::default(),
+                    },
+                    invertido: false,
+                    acao: None,
+                },
+                Bloco::Contato {
+                    titulo: None,
+                    texto: None,
+                    telefone: None,
+                    whatsapp: None,
+                    email: Some("sem-arroba".into()),
+                    endereco: None,
+                    horario: Some("Das 8h às 18h".into()),
+                },
+            ];
+        });
+        let achados: Vec<(&str, &str)> = problemas
+            .iter()
+            .map(|p| (p.codigo, p.campo.as_str()))
+            .collect();
+        assert_eq!(
+            achados,
+            vec![
+                ("secao.vazia", "corpo[0].itens"),
+                ("secao.texto.vazio", "corpo[1].itens[0].texto"),
+                ("link.invalido", "corpo[1].itens[0].acao.url"),
+                ("secao.titulo.vazio", "corpo[1].titulo"),
+                ("secao.imagem.falta", "corpo[2].midia"),
+                ("contato.email", "corpo[3].email"),
+            ]
+        );
+    }
+
+    #[test]
+    fn abertura_pede_texto_e_no_maximo_dois_botoes() {
+        use crate::tipos::Acao;
+
+        let problemas = com_apresentacao(|pagina| {
+            let abertura = pagina.abertura.as_mut().expect("abertura");
+            abertura.texto = String::new();
+            abertura.acoes.push(Acao {
+                rotulo: "Terceiro".into(),
+                url: "/sobre".into(),
+            });
+        });
+        assert_eq!(
+            codigos(&problemas),
+            vec!["secao.texto.vazio", "secao.botoes"]
+        );
+    }
+
+    #[test]
+    fn titulo_de_texto_pode_vir_depois_de_uma_secao() {
+        let problemas = com_apresentacao(|pagina| {
+            pagina.corpo.push(Bloco::Titulo {
+                nivel: 2,
+                texto: "Mais sobre a oficina".into(),
+            });
+        });
+        assert_eq!(problemas, vec![]);
     }
 
     #[test]
