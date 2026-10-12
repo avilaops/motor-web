@@ -20,7 +20,8 @@ use crate::validacao::{Gravidade, Problema, normalizar_slug, validar_upload};
 pub const LARGURAS: [u32; 4] = [480, 768, 1200, 1920];
 
 const QUALIDADE_WEBP: f32 = 78.0;
-const QUALIDADE_AVIF: u8 = 55;
+/// De 1 a 100: mais alto fica mais perto do original e pesa mais.
+const QUALIDADE_AVIF: u8 = 63;
 /// De 1 (lento, arquivo menor) a 10 (rápido).
 const VELOCIDADE_AVIF: u8 = 6;
 
