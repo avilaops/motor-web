@@ -3,7 +3,7 @@
 use crate::escape::{marcacao, uma_linha};
 use crate::midia::{Papel, renderizar_midia, url_principal};
 use crate::secoes;
-use crate::tipos::{Bloco, Trecho};
+use crate::tipos::{Bloco, Midia, Modelo3d, Trecho};
 use crate::url::{incorporacao_de_video, link_valido};
 
 /// Largura da coluna de texto, para o navegador escolher a variante certa.
@@ -91,6 +91,11 @@ fn renderizar_bloco(bloco: &Bloco, indice: usize) -> String {
             ),
             None => String::new(),
         },
+        Bloco::Modelo3d {
+            modelo,
+            capa,
+            legenda,
+        } => renderizar_modelo_3d(modelo, capa.as_ref(), legenda.as_deref()),
         Bloco::Chamada { texto, rotulo, url } => {
             let link = if link_valido(url) {
                 format!(r#"<a href="{}">{}</a>"#, marcacao(url), marcacao(rotulo))
@@ -129,6 +134,36 @@ fn renderizar_trecho(trecho: &Trecho) -> String {
         html = format!(r#"<a href="{}">{html}</a>"#, marcacao(link));
     }
     html
+}
+
+/// O elemento `<modelo-3d>` é o visualizador do CMS: recebe o GLB em `src` e
+/// o USDZ em `ios-src`. O que vai dentro dele é o que aparece antes de o
+/// visualizador carregar e para quem está sem script: a capa e, no iPhone, o
+/// atalho de realidade aumentada, que não depende de script nenhum (o Safari
+/// abre o USDZ de um link `rel="ar"` que tenha uma imagem dentro).
+fn renderizar_modelo_3d(modelo: &Modelo3d, capa: Option<&Midia>, legenda: Option<&str>) -> String {
+    let imagem = capa
+        .map(|capa| renderizar_midia(capa, Papel::Conteudo, SIZES_DO_CORPO))
+        .unwrap_or_default();
+    let ios = modelo
+        .usdz
+        .as_deref()
+        .map(|usdz| format!(r#" ios-src="{}""#, marcacao(usdz)))
+        .unwrap_or_default();
+    let dentro = match (&modelo.usdz, imagem.is_empty()) {
+        (Some(usdz), false) => format!(r#"<a rel="ar" href="{}">{imagem}</a>"#, marcacao(usdz)),
+        _ => imagem,
+    };
+    let legenda = legenda
+        .map(str::trim)
+        .filter(|legenda| !legenda.is_empty())
+        .map(|legenda| format!("<figcaption>{}</figcaption>", marcacao(legenda)))
+        .unwrap_or_default();
+    format!(
+        r#"<figure class="modelo-3d"><modelo-3d src="{}"{ios} alt="{}">{dentro}</modelo-3d>{legenda}</figure>"#,
+        marcacao(&modelo.glb),
+        marcacao(&modelo.descricao),
+    )
 }
 
 /// O corpo em Markdown. Alimenta o `llms-full.txt`.
@@ -204,6 +239,13 @@ fn texto_do_bloco(bloco: &Bloco) -> String {
             .collect::<Vec<_>>()
             .join("\n\n"),
         Bloco::Video { url, titulo } => format!("[{}]({url})", uma_linha(titulo)),
+        Bloco::Modelo3d { modelo, .. } => {
+            format!(
+                "[Modelo 3D: {}]({})",
+                uma_linha(&modelo.descricao),
+                modelo.glb
+            )
+        }
         Bloco::Chamada { texto, rotulo, url } => {
             format!("{} [{}]({url})", uma_linha(texto), uma_linha(rotulo))
         }
@@ -250,7 +292,7 @@ pub fn contar_palavras(blocos: &[Bloco]) -> usize {
                 .iter()
                 .map(|i| palavras(&i.pergunta) + palavras(&i.resposta))
                 .sum(),
-            Bloco::Imagem { .. } | Bloco::Video { .. } => 0,
+            Bloco::Imagem { .. } | Bloco::Video { .. } | Bloco::Modelo3d { .. } => 0,
             Bloco::Cartoes { .. }
             | Bloco::Destaque { .. }
             | Bloco::Depoimentos { .. }
@@ -408,5 +450,39 @@ mod testes {
             },
         ];
         assert_eq!(contar_palavras(&blocos), 5);
+    }
+
+    #[test]
+    fn modelo_3d_sai_com_o_visualizador_e_o_atalho_do_iphone() {
+        use crate::tipos::Modelo3d;
+        let modelo = Modelo3d {
+            id: "m1".into(),
+            glb: "/midia/modelos/m1.glb".into(),
+            usdz: Some("/midia/modelos/m1.usdz".into()),
+            descricao: "Leg press \"45 graus\"".into(),
+        };
+        let html = renderizar_corpo(&[Bloco::Modelo3d {
+            modelo: modelo.clone(),
+            capa: None,
+            legenda: Some("Gire com o dedo".into()),
+        }]);
+        assert!(html.contains(
+            r#"<modelo-3d src="/midia/modelos/m1.glb" ios-src="/midia/modelos/m1.usdz""#
+        ));
+        assert!(html.contains("alt=\"Leg press &quot;45 graus&quot;\""));
+        assert!(html.contains("<figcaption>Gire com o dedo</figcaption>"));
+        // Sem capa não há o que pôr dentro do atalho de realidade aumentada.
+        assert!(!html.contains("rel=\"ar\""));
+
+        let sem_iphone = renderizar_corpo(&[Bloco::Modelo3d {
+            modelo: Modelo3d {
+                usdz: None,
+                ..modelo
+            },
+            capa: None,
+            legenda: None,
+        }]);
+        assert!(!sem_iphone.contains("ios-src"));
+        assert!(!sem_iphone.contains("figcaption"));
     }
 }

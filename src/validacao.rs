@@ -23,6 +23,11 @@ pub const DESCRICAO_RECOMENDADA: usize = 155;
 pub const DESCRICAO_MAXIMA: usize = 170;
 pub const LARGURA_MINIMA_DA_CAPA: u32 = 1200;
 pub const UPLOAD_MAXIMO_BYTES: usize = 15 * 1024 * 1024;
+/// Onde o site serve os modelos 3D da biblioteca dele.
+pub const CAMINHO_DOS_MODELOS: &str = "/midia/modelos/";
+/// O teto de um arquivo de modelo 3D (GLB ou USDZ). Modelo maior que isto
+/// demora demais para abrir no celular.
+pub const MODELO_MAXIMO_BYTES: usize = 30 * 1024 * 1024;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "kebab-case")]
@@ -416,6 +421,35 @@ fn validar_corpo(blocos: &[Bloco], problemas: &mut Vec<Problema>) {
             Bloco::Chamada { url, .. } => {
                 if !link_valido(url) {
                     problemas.push(link_invalido(format!("corpo[{i}].url")));
+                }
+            }
+            Bloco::Modelo3d { modelo, capa, .. } => {
+                if modelo.descricao.trim().is_empty() {
+                    problemas.push(Problema::bloqueia(
+                        "modelo.descricao.vazia",
+                        format!("corpo[{i}].modelo.descricao"),
+                        "Descreva o que o modelo 3D mostra, para quem não o enxerga.",
+                    ));
+                }
+                // Só arquivo da biblioteca do próprio site: o visualizador não
+                // abre modelo de outro endereço.
+                let da_biblioteca = |endereco: &str, extensao: &str| {
+                    endereco.starts_with(CAMINHO_DOS_MODELOS) && endereco.ends_with(extensao)
+                };
+                let arquivos_certos = da_biblioteca(&modelo.glb, ".glb")
+                    && modelo
+                        .usdz
+                        .as_deref()
+                        .is_none_or(|usdz| da_biblioteca(usdz, ".usdz"));
+                if !arquivos_certos {
+                    problemas.push(Problema::bloqueia(
+                        "modelo.arquivo",
+                        format!("corpo[{i}].modelo"),
+                        "Escolha um modelo 3D da biblioteca do site.",
+                    ));
+                }
+                if let Some(capa) = capa {
+                    validar_alt(capa, &format!("corpo[{i}].capa.alt"), problemas);
                 }
             }
             Bloco::Video { url, .. } => {

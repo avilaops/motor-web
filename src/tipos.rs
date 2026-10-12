@@ -106,6 +106,20 @@ impl Direitos {
     }
 }
 
+/// Um modelo 3D da biblioteca do site. O GLB é o que o visualizador abre na
+/// página e o Android usa na realidade aumentada; o USDZ é o que o iPhone
+/// pede para a mesma coisa. Sem USDZ, o iPhone fica só com o visualizador.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Modelo3d {
+    pub id: String,
+    pub glb: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub usdz: Option<String>,
+    /// O que o modelo mostra, para quem não o enxerga.
+    pub descricao: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Variante {
@@ -341,6 +355,17 @@ pub enum Bloco {
         url: String,
         titulo: String,
     },
+    /// Um modelo 3D que o visitante gira na página e, no celular, põe no
+    /// próprio espaço. A capa é a imagem mostrada antes de o modelo carregar
+    /// e para quem está sem o visualizador.
+    #[serde(rename = "modelo-3d")]
+    Modelo3d {
+        modelo: Modelo3d,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        capa: Option<Midia>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        legenda: Option<String>,
+    },
     Chamada {
         texto: String,
         rotulo: String,
@@ -454,6 +479,7 @@ impl Bloco {
                 | Bloco::Tabela { .. }
                 | Bloco::Perguntas { .. }
                 | Bloco::Video { .. }
+                | Bloco::Modelo3d { .. }
                 | Bloco::Chamada { .. }
         )
     }
@@ -467,6 +493,7 @@ impl Bloco {
                 itens.iter().filter_map(|i| i.foto.as_ref()).collect()
             }
             Bloco::Galeria { itens, .. } | Bloco::Logos { itens, .. } => itens.iter().collect(),
+            Bloco::Modelo3d { capa, .. } => capa.iter().collect(),
             _ => Vec::new(),
         }
     }
@@ -481,6 +508,7 @@ impl Bloco {
                 itens.iter_mut().filter_map(|i| i.foto.as_mut()).collect()
             }
             Bloco::Galeria { itens, .. } | Bloco::Logos { itens, .. } => itens.iter_mut().collect(),
+            Bloco::Modelo3d { capa, .. } => capa.iter_mut().collect(),
             _ => Vec::new(),
         }
     }
@@ -690,6 +718,23 @@ impl Documento {
         };
         midias.extend(self.corpo().iter().flat_map(Bloco::midias));
         midias
+    }
+
+    /// Os modelos 3D do corpo, na ordem em que aparecem.
+    pub fn modelos_3d(&self) -> Vec<&Modelo3d> {
+        self.corpo()
+            .iter()
+            .filter_map(|bloco| match bloco {
+                Bloco::Modelo3d { modelo, .. } => Some(modelo),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// A página precisa do visualizador 3D: é o único caso em que um site
+    /// carrega script que não é a tag de medição.
+    pub fn tem_modelo_3d(&self) -> bool {
+        !self.modelos_3d().is_empty()
     }
 
     /// Página de apresentação: tem abertura ou alguma seção, e sai no
