@@ -14,13 +14,16 @@ const SIZES_DO_CORPO: &str = "(min-width: 800px) 768px, 100vw";
 pub fn renderizar_corpo(blocos: &[Bloco]) -> String {
     blocos
         .iter()
-        .map(renderizar_bloco)
+        .enumerate()
+        .map(|(indice, bloco)| renderizar_bloco(bloco, indice))
         .filter(|html| !html.is_empty())
         .collect::<Vec<_>>()
         .join("\n")
 }
 
-fn renderizar_bloco(bloco: &Bloco) -> String {
+/// `indice` é a posição do bloco no corpo: o formulário a leva no envio, para
+/// o site saber qual formulário da página foi preenchido.
+fn renderizar_bloco(bloco: &Bloco, indice: usize) -> String {
     match bloco {
         Bloco::Paragrafo { trechos } => {
             format!(
@@ -108,7 +111,8 @@ fn renderizar_bloco(bloco: &Bloco) -> String {
         | Bloco::Galeria { .. }
         | Bloco::Logos { .. }
         | Bloco::Faixa { .. }
-        | Bloco::Contato { .. } => secoes::renderizar(bloco),
+        | Bloco::Formulario { .. }
+        | Bloco::Contato { .. } => secoes::renderizar(bloco, indice),
     }
 }
 
@@ -212,6 +216,7 @@ fn texto_do_bloco(bloco: &Bloco) -> String {
         | Bloco::Galeria { .. }
         | Bloco::Logos { .. }
         | Bloco::Faixa { .. }
+        | Bloco::Formulario { .. }
         | Bloco::Contato { .. } => secoes::em_markdown(bloco),
     }
 }
@@ -255,6 +260,7 @@ pub fn contar_palavras(blocos: &[Bloco]) -> usize {
             | Bloco::Galeria { .. }
             | Bloco::Logos { .. }
             | Bloco::Faixa { .. }
+            | Bloco::Formulario { .. }
             | Bloco::Contato { .. } => palavras(&secoes::em_markdown(bloco)),
         })
         .sum()

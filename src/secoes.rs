@@ -7,7 +7,7 @@
 
 use crate::escape::{marcacao, uma_linha};
 use crate::midia::{Papel, renderizar_midia};
-use crate::tipos::{Acao, Bloco, Midia, Pagina};
+use crate::tipos::{Acao, Bloco, Campo, Midia, Pagina, TipoDeCampo};
 use crate::url::link_valido;
 
 const SIZES_DE_CARTAO: &str = "(min-width: 900px) 352px, (min-width: 600px) 50vw, 100vw";
@@ -65,7 +65,13 @@ pub const ESTILO_DAS_SECOES: &str = "\
 .s-faixa .botao{background:#fff;color:var(--destaque,#9a3412);border-color:#fff}\
 .s-faixa .botao.secundario{background:transparent;color:#fff}\
 .s-canais{list-style:none;padding:0;margin:1.5rem 0 0;display:grid;gap:.75rem}\
-.s-canais span{display:block;font-size:.9375rem;color:var(--suave,#57534e)}";
+.s-canais span{display:block;font-size:.9375rem;color:var(--suave,#57534e)}\
+.s-formulario form{display:grid;gap:.5rem;max-width:34rem;margin-top:1.5rem}\
+.s-formulario label{font-weight:600;margin-top:.5rem}\
+.s-formulario input,.s-formulario textarea{font:inherit;padding:.65rem .75rem;border:1px solid var(--suave,#57534e);border-radius:.375rem;width:100%;background:#fff;color:inherit}\
+.s-formulario input:focus-visible,.s-formulario textarea:focus-visible{outline:3px solid var(--destaque,#9a3412);outline-offset:1px}\
+.s-formulario button{cursor:pointer;justify-self:start;margin-top:1rem;font:inherit;font-weight:600}\
+.s-isca{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}";
 
 fn preenchido(texto: &Option<String>) -> Option<&str> {
     texto.as_deref().map(str::trim).filter(|t| !t.is_empty())
@@ -179,7 +185,36 @@ pub fn renderizar_abertura(pagina: &Pagina) -> Option<String> {
 }
 
 /// O HTML de uma seção. Vazio para bloco que não é seção.
-pub(crate) fn renderizar(bloco: &Bloco) -> String {
+/// O campo de um formulário: rótulo ligado ao controle, tipo que abre o
+/// teclado certo no celular e o limite que o site também confere ao receber.
+fn campo(campo: &Campo, formulario: usize, posicao: usize) -> String {
+    let id = format!("f{formulario}c{posicao}");
+    let obrigatorio = if campo.obrigatorio { " required" } else { "" };
+    let limite = campo.tipo.limite();
+    let controle = match campo.tipo {
+        TipoDeCampo::Mensagem => format!(
+            r#"<textarea id="{id}" name="c{posicao}" rows="5" maxlength="{limite}"{obrigatorio}></textarea>"#
+        ),
+        tipo => {
+            let (tipo, completar) = match tipo {
+                TipoDeCampo::Email => ("email", "email"),
+                TipoDeCampo::Telefone => ("tel", "tel"),
+                _ => ("text", "on"),
+            };
+            format!(
+                r#"<input id="{id}" name="c{posicao}" type="{tipo}" autocomplete="{completar}" maxlength="{limite}"{obrigatorio}>"#
+            )
+        }
+    };
+    format!(
+        r#"<label for="{id}">{}</label>{controle}"#,
+        marcacao(&campo.rotulo)
+    )
+}
+
+/// O HTML de uma seção. Vazio para bloco que não é seção. `indice` é a
+/// posição do bloco no corpo.
+pub(crate) fn renderizar(bloco: &Bloco, indice: usize) -> String {
     match bloco {
         Bloco::Cartoes {
             titulo,
@@ -323,6 +358,30 @@ pub(crate) fn renderizar(bloco: &Bloco) -> String {
                 botoes(acoes)
             ),
         ),
+        Bloco::Formulario {
+            titulo,
+            texto,
+            campos,
+            botao,
+            ..
+        } => {
+            let controles: String = campos
+                .iter()
+                .enumerate()
+                .map(|(posicao, item)| campo(item, indice, posicao))
+                .collect();
+            // Sem `action`: o envio vai para o endereço da própria página. O
+            // campo `site` é a isca: gente não o vê, robô o preenche.
+            secao(
+                "s-formulario",
+                preenchido(titulo),
+                preenchido(texto),
+                &format!(
+                    r#"<form method="post" id="formulario-{indice}"><input type="hidden" name="formulario" value="{indice}"><p class="s-isca" aria-hidden="true"><label for="f{indice}site">Não preencha</label><input id="f{indice}site" name="site" tabindex="-1" autocomplete="off"></p>{controles}<button class="botao" type="submit">{}</button></form>"#,
+                    marcacao(botao)
+                ),
+            )
+        }
         Bloco::Contato {
             titulo,
             texto,
@@ -471,6 +530,20 @@ pub(crate) fn em_markdown(bloco: &Bloco) -> String {
                     .map(|midia| format!("- {}", uma_linha(&midia.alt))),
             );
         }
+        Bloco::Formulario {
+            titulo,
+            texto,
+            campos,
+            ..
+        } => {
+            linhas.extend(titulo_da_secao(preenchido(titulo)));
+            linhas.extend(preenchido(texto).map(uma_linha));
+            linhas.extend(
+                campos
+                    .iter()
+                    .map(|campo| format!("- {}", uma_linha(&campo.rotulo))),
+            );
+        }
         Bloco::Faixa {
             titulo,
             texto,
@@ -541,7 +614,12 @@ mod testes {
     #[test]
     fn secao_nunca_gera_h1_e_escapa_o_que_recebe() {
         let pagina = apresentacao();
-        let html: String = pagina.corpo.iter().map(renderizar).collect();
+        let html: String = pagina
+            .corpo
+            .iter()
+            .enumerate()
+            .map(|(indice, bloco)| renderizar(bloco, indice))
+            .collect();
         assert!(!html.contains("<h1"));
         assert_eq!(
             html.matches("<section").count(),
@@ -561,7 +639,7 @@ mod testes {
                 }),
             }],
         };
-        let html = renderizar(&malicioso);
+        let html = renderizar(&malicioso, 0);
         assert!(!html.contains("<script>"));
         assert!(!html.contains("javascript:"));
         assert!(html.contains("a &lt; b"));
@@ -569,20 +647,66 @@ mod testes {
 
     #[test]
     fn contato_monta_os_links_de_cada_canal() {
-        let html = renderizar(&Bloco::Contato {
-            titulo: Some("Fale com a gente".into()),
-            texto: None,
-            telefone: Some("(11) 4000-0000".into()),
-            whatsapp: Some("(11) 90000-0000".into()),
-            email: Some("contato@exemplo.example".into()),
-            endereco: Some("Rua das Flores, 100".into()),
-            horario: None,
-        });
+        let html = renderizar(
+            &Bloco::Contato {
+                titulo: Some("Fale com a gente".into()),
+                texto: None,
+                telefone: Some("(11) 4000-0000".into()),
+                whatsapp: Some("(11) 90000-0000".into()),
+                email: Some("contato@exemplo.example".into()),
+                endereco: Some("Rua das Flores, 100".into()),
+                horario: None,
+            },
+            0,
+        );
         assert!(html.contains(r#"href="tel:+551140000000""#));
         assert!(html.contains(r#"href="https://wa.me/5511900000000""#));
         assert!(html.contains(r#"href="mailto:contato@exemplo.example""#));
         assert!(html.contains("Rua das Flores, 100"));
         assert!(!html.contains("Horário"));
+    }
+
+    #[test]
+    fn formulario_sai_sem_script_com_rotulo_tipo_e_isca() {
+        let html = renderizar(
+            &Bloco::Formulario {
+                titulo: Some("Fale com a gente".into()),
+                texto: None,
+                campos: vec![
+                    Campo {
+                        rotulo: "Seu <nome>".into(),
+                        tipo: TipoDeCampo::Texto,
+                        obrigatorio: true,
+                    },
+                    Campo {
+                        rotulo: "E-mail".into(),
+                        tipo: TipoDeCampo::Email,
+                        obrigatorio: false,
+                    },
+                    Campo {
+                        rotulo: "Mensagem".into(),
+                        tipo: TipoDeCampo::Mensagem,
+                        obrigatorio: true,
+                    },
+                ],
+                botao: "Enviar".into(),
+                agradecimento: "Recebemos.".into(),
+            },
+            3,
+        );
+        assert!(html.contains(r#"<form method="post" id="formulario-3">"#));
+        assert!(html.contains(r#"name="formulario" value="3""#));
+        assert!(html.contains(r#"<label for="f3c0">Seu &lt;nome&gt;</label>"#));
+        assert!(
+            html.contains(r#"name="c0" type="text" autocomplete="on" maxlength="200" required>"#)
+        );
+        assert!(html.contains(r#"name="c1" type="email" autocomplete="email" maxlength="200">"#));
+        assert!(
+            html.contains(r#"<textarea id="f3c2" name="c2" rows="5" maxlength="4000" required>"#)
+        );
+        // A isca existe, fora da ordem de tabulação.
+        assert!(html.contains(r#"name="site" tabindex="-1""#));
+        assert!(!html.contains("<script") && !html.contains("action="));
     }
 
     #[test]

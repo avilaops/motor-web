@@ -559,6 +559,29 @@ fn validar_secao(bloco: &Bloco, campo: &str, problemas: &mut Vec<Problema>) -> O
             }
             (true, acoes.len(), false)
         }
+        Bloco::Formulario {
+            titulo,
+            campos,
+            botao,
+            agradecimento,
+            ..
+        } => {
+            for (j, item) in campos.iter().enumerate() {
+                exigir(&item.rotulo, format!("campos[{j}].rotulo"), problemas);
+            }
+            exigir(botao, "botao".into(), problemas);
+            exigir(agradecimento, "agradecimento".into(), problemas);
+            if campos.len() > MAXIMO_DE_CAMPOS {
+                problemas.push(Problema::bloqueia(
+                    "formulario.campos",
+                    format!("{campo}.campos"),
+                    format!(
+                        "O formulário tem campos demais. Peça só o necessário: até {MAXIMO_DE_CAMPOS} campos."
+                    ),
+                ));
+            }
+            (preenchido(titulo), campos.len(), false)
+        }
         Bloco::Contato {
             titulo,
             telefone,
@@ -607,6 +630,9 @@ fn validar_secao(bloco: &Bloco, campo: &str, problemas: &mut Vec<Problema>) -> O
         (false, false) => None,
     }
 }
+
+/// Formulário longo afasta quem ia escrever, e cada campo é dado a guardar.
+pub const MAXIMO_DE_CAMPOS: usize = 8;
 
 /// Mais de dois botões lado a lado, e nenhum é o principal.
 const MAXIMO_DE_BOTOES: usize = 2;
@@ -934,6 +960,48 @@ mod testes {
         assert_eq!(
             codigos(&problemas),
             vec!["secao.texto.vazio", "secao.botoes"]
+        );
+    }
+
+    #[test]
+    fn formulario_pede_campo_botao_e_agradecimento() {
+        use crate::tipos::{Campo, TipoDeCampo};
+
+        let problemas = com_apresentacao(|pagina| {
+            pagina.corpo = vec![
+                Bloco::Formulario {
+                    titulo: Some("Contato".into()),
+                    texto: None,
+                    campos: vec![],
+                    botao: " ".into(),
+                    agradecimento: "Obrigado.".into(),
+                },
+                Bloco::Formulario {
+                    titulo: None,
+                    texto: None,
+                    campos: (0..9)
+                        .map(|i| Campo {
+                            rotulo: format!("Campo {i}"),
+                            tipo: TipoDeCampo::Texto,
+                            obrigatorio: false,
+                        })
+                        .collect(),
+                    botao: "Enviar".into(),
+                    agradecimento: "Obrigado.".into(),
+                },
+            ];
+        });
+        let achados: Vec<(&str, &str)> = problemas
+            .iter()
+            .map(|p| (p.codigo, p.campo.as_str()))
+            .collect();
+        assert_eq!(
+            achados,
+            vec![
+                ("secao.texto.vazio", "corpo[0].botao"),
+                ("secao.vazia", "corpo[0].itens"),
+                ("formulario.campos", "corpo[1].campos"),
+            ]
         );
     }
 

@@ -408,6 +408,19 @@ pub enum Bloco {
         texto: Option<String>,
         acoes: Vec<Acao>,
     },
+    /// Formulário de contato. O visitante preenche, o site guarda a mensagem
+    /// e avisa o dono; não há script, o envio é o do próprio navegador.
+    Formulario {
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        titulo: Option<String>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        texto: Option<String>,
+        campos: Vec<Campo>,
+        /// O que está escrito no botão de enviar.
+        botao: String,
+        /// O que o visitante lê depois de enviar.
+        agradecimento: String,
+    },
     /// Como falar com o negócio. Pelo menos um canal.
     Contato {
         #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -469,6 +482,38 @@ impl Bloco {
             }
             Bloco::Galeria { itens, .. } | Bloco::Logos { itens, .. } => itens.iter_mut().collect(),
             _ => Vec::new(),
+        }
+    }
+}
+
+/// Um campo de formulário.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Campo {
+    /// O que o visitante lê acima do campo.
+    pub rotulo: String,
+    pub tipo: TipoDeCampo,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub obrigatorio: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TipoDeCampo {
+    /// Uma linha de texto.
+    Texto,
+    Email,
+    Telefone,
+    /// Texto longo, em várias linhas.
+    Mensagem,
+}
+
+impl TipoDeCampo {
+    /// O máximo de caracteres que o campo aceita.
+    pub fn limite(self) -> usize {
+        match self {
+            TipoDeCampo::Mensagem => 4000,
+            TipoDeCampo::Texto | TipoDeCampo::Email | TipoDeCampo::Telefone => 200,
         }
     }
 }
