@@ -12,7 +12,7 @@ use unicode_normalization::char::is_combining_mark;
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::secoes::email_valido;
-use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia};
+use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia, TipoDeCampo};
 use crate::url::{incorporacao_de_video, link_valido};
 
 /// O nome de uma página no menu: cabe em uma linha no celular.
@@ -568,6 +568,18 @@ fn validar_secao(bloco: &Bloco, campo: &str, problemas: &mut Vec<Problema>) -> O
         } => {
             for (j, item) in campos.iter().enumerate() {
                 exigir(&item.rotulo, format!("campos[{j}].rotulo"), problemas);
+                let alternativas = item
+                    .opcoes
+                    .iter()
+                    .filter(|opcao| !opcao.trim().is_empty())
+                    .count();
+                if item.tipo == TipoDeCampo::Escolha && alternativas < 2 {
+                    problemas.push(Problema::bloqueia(
+                        "formulario.opcoes",
+                        format!("{campo}.campos[{j}].opcoes"),
+                        "Campo de escolha precisa de pelo menos duas alternativas.",
+                    ));
+                }
             }
             exigir(botao, "botao".into(), problemas);
             exigir(agradecimento, "agradecimento".into(), problemas);
@@ -984,6 +996,7 @@ mod testes {
                             rotulo: format!("Campo {i}"),
                             tipo: TipoDeCampo::Texto,
                             obrigatorio: false,
+                            opcoes: vec![],
                         })
                         .collect(),
                     botao: "Enviar".into(),
@@ -1003,6 +1016,33 @@ mod testes {
                 ("formulario.campos", "corpo[1].campos"),
             ]
         );
+    }
+
+    #[test]
+    fn campo_de_escolha_precisa_de_alternativas() {
+        use crate::tipos::{Campo, TipoDeCampo};
+
+        let com = |opcoes: &[&str]| {
+            com_apresentacao(|pagina| {
+                pagina.corpo = vec![Bloco::Formulario {
+                    titulo: None,
+                    texto: None,
+                    campos: vec![Campo {
+                        rotulo: "Momento".into(),
+                        tipo: TipoDeCampo::Escolha,
+                        obrigatorio: true,
+                        opcoes: opcoes.iter().map(|o| (*o).to_string()).collect(),
+                    }],
+                    botao: "Enviar".into(),
+                    agradecimento: "Obrigado.".into(),
+                }];
+            })
+        };
+        assert_eq!(
+            codigos(&com(&["Começando", " "])),
+            vec!["formulario.opcoes"]
+        );
+        assert_eq!(com(&["Começando", "Crescendo"]), vec![]);
     }
 
     #[test]

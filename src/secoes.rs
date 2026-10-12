@@ -68,8 +68,8 @@ pub const ESTILO_DAS_SECOES: &str = "\
 .s-canais span{display:block;font-size:.9375rem;color:var(--suave,#57534e)}\
 .s-formulario form{display:grid;gap:.5rem;max-width:34rem;margin-top:1.5rem}\
 .s-formulario label{font-weight:600;margin-top:.5rem}\
-.s-formulario input,.s-formulario textarea{font:inherit;padding:.65rem .75rem;border:1px solid var(--suave,#57534e);border-radius:.375rem;width:100%;background:#fff;color:inherit}\
-.s-formulario input:focus-visible,.s-formulario textarea:focus-visible{outline:3px solid var(--destaque,#9a3412);outline-offset:1px}\
+.s-formulario input,.s-formulario textarea,.s-formulario select{font:inherit;padding:.65rem .75rem;border:1px solid var(--suave,#57534e);border-radius:.375rem;width:100%;background:#fff;color:inherit}\
+.s-formulario input:focus-visible,.s-formulario textarea:focus-visible,.s-formulario select:focus-visible{outline:3px solid var(--destaque,#9a3412);outline-offset:1px}\
 .s-formulario button{cursor:pointer;justify-self:start;margin-top:1rem;font:inherit;font-weight:600}\
 .s-isca{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}";
 
@@ -195,6 +195,17 @@ fn campo(campo: &Campo, formulario: usize, posicao: usize) -> String {
         TipoDeCampo::Mensagem => format!(
             r#"<textarea id="{id}" name="c{posicao}" rows="5" maxlength="{limite}"{obrigatorio}></textarea>"#
         ),
+        TipoDeCampo::Escolha => {
+            // A primeira alternativa é vazia: campo obrigatório exige escolher.
+            let alternativas: String = campo
+                .opcoes
+                .iter()
+                .map(|opcao| format!("<option>{}</option>", marcacao(opcao)))
+                .collect();
+            format!(
+                r#"<select id="{id}" name="c{posicao}"{obrigatorio}><option value="">Escolha</option>{alternativas}</select>"#
+            )
+        }
         tipo => {
             let (tipo, completar) = match tipo {
                 TipoDeCampo::Email => ("email", "email"),
@@ -677,16 +688,25 @@ mod testes {
                         rotulo: "Seu <nome>".into(),
                         tipo: TipoDeCampo::Texto,
                         obrigatorio: true,
+                        opcoes: vec![],
                     },
                     Campo {
                         rotulo: "E-mail".into(),
                         tipo: TipoDeCampo::Email,
                         obrigatorio: false,
+                        opcoes: vec![],
                     },
                     Campo {
                         rotulo: "Mensagem".into(),
                         tipo: TipoDeCampo::Mensagem,
                         obrigatorio: true,
+                        opcoes: vec![],
+                    },
+                    Campo {
+                        rotulo: "Momento".into(),
+                        tipo: TipoDeCampo::Escolha,
+                        obrigatorio: true,
+                        opcoes: vec!["Começando".into(), "Vendendo <mais>".into()],
                     },
                 ],
                 botao: "Enviar".into(),
@@ -704,6 +724,9 @@ mod testes {
         assert!(
             html.contains(r#"<textarea id="f3c2" name="c2" rows="5" maxlength="4000" required>"#)
         );
+        assert!(html.contains(
+            r#"<select id="f3c3" name="c3" required><option value="">Escolha</option><option>Começando</option><option>Vendendo &lt;mais&gt;</option></select>"#
+        ));
         // A isca existe, fora da ordem de tabulação.
         assert!(html.contains(r#"name="site" tabindex="-1""#));
         assert!(!html.contains("<script") && !html.contains("action="));

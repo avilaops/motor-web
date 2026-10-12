@@ -495,6 +495,9 @@ pub struct Campo {
     pub tipo: TipoDeCampo,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub obrigatorio: bool,
+    /// As alternativas de um campo de escolha, na ordem em que aparecem.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub opcoes: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -506,6 +509,8 @@ pub enum TipoDeCampo {
     Telefone,
     /// Texto longo, em várias linhas.
     Mensagem,
+    /// Uma entre as alternativas de `opcoes`.
+    Escolha,
 }
 
 impl TipoDeCampo {
@@ -513,7 +518,10 @@ impl TipoDeCampo {
     pub fn limite(self) -> usize {
         match self {
             TipoDeCampo::Mensagem => 4000,
-            TipoDeCampo::Texto | TipoDeCampo::Email | TipoDeCampo::Telefone => 200,
+            TipoDeCampo::Texto
+            | TipoDeCampo::Email
+            | TipoDeCampo::Telefone
+            | TipoDeCampo::Escolha => 200,
         }
     }
 }
