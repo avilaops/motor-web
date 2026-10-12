@@ -12,7 +12,7 @@ use unicode_normalization::char::is_combining_mark;
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::secoes::email_valido;
-use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia, TipoDeCampo};
+use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia, Modelo3d, TipoDeCampo};
 use crate::url::{incorporacao_de_video, link_valido};
 
 /// O nome de uma página no menu: cabe em uma linha no celular.
@@ -139,6 +139,14 @@ pub fn deve_atualizar_data(antes: &Documento, depois: &Documento) -> bool {
         (Conteudo::Post(a), Conteudo::Post(d)) => {
             a.titulo != d.titulo || a.resumo != d.resumo || a.corpo != d.corpo || a.capa != d.capa
         }
+        (Conteudo::Item(a), Conteudo::Item(d)) => {
+            a.nome != d.nome
+                || a.resumo != d.resumo
+                || a.imagens != d.imagens
+                || a.modelo != d.modelo
+                || a.ficha != d.ficha
+                || a.corpo != d.corpo
+        }
         (Conteudo::Produto(a), Conteudo::Produto(d)) => {
             a.nome != d.nome
                 || a.descricao != d.descricao
@@ -155,7 +163,7 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
     validar_busca(documento, contexto, &mut problemas);
     validar_slug(documento, contexto, &mut problemas);
     if documento.titulo().trim().is_empty() {
-        let campo = if matches!(documento.conteudo, Conteudo::Produto(_)) {
+        let campo = if matches!(documento.conteudo, Conteudo::Produto(_) | Conteudo::Item(_)) {
             "nome"
         } else {
             "titulo"
@@ -217,6 +225,33 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
                 ));
             } else {
                 validar_alt(&post.autor.foto, "autor.foto.alt", &mut problemas);
+            }
+        }
+        Conteudo::Item(item) => {
+            if item.resumo.trim().is_empty() {
+                problemas.push(Problema::bloqueia(
+                    "item.resumo.vazio",
+                    "resumo",
+                    "Escreva uma ou duas frases sobre o produto. Elas aparecem no topo da página e na listagem.",
+                ));
+            }
+            for (i, imagem) in item.imagens.iter().enumerate() {
+                validar_alt(imagem, &format!("imagens[{i}].alt"), &mut problemas);
+            }
+            if let Some(modelo) = &item.modelo {
+                validar_modelo_3d(modelo, "modelo", &mut problemas);
+            }
+            for (i, linha) in item.ficha.iter().enumerate() {
+                if linha.nome.trim().is_empty() || linha.valor.trim().is_empty() {
+                    problemas.push(Problema::bloqueia(
+                        "item.ficha.incompleta",
+                        format!("ficha[{i}]"),
+                        "Cada linha da ficha técnica precisa do nome e do valor, como Peso e 156 kg.",
+                    ));
+                }
+            }
+            if let Some(acao) = &item.acao {
+                validar_acao(acao, "acao", &mut problemas);
             }
         }
         Conteudo::Produto(produto) => {
@@ -424,30 +459,7 @@ fn validar_corpo(blocos: &[Bloco], problemas: &mut Vec<Problema>) {
                 }
             }
             Bloco::Modelo3d { modelo, capa, .. } => {
-                if modelo.descricao.trim().is_empty() {
-                    problemas.push(Problema::bloqueia(
-                        "modelo.descricao.vazia",
-                        format!("corpo[{i}].modelo.descricao"),
-                        "Descreva o que o modelo 3D mostra, para quem não o enxerga.",
-                    ));
-                }
-                // Só arquivo da biblioteca do próprio site: o visualizador não
-                // abre modelo de outro endereço.
-                let da_biblioteca = |endereco: &str, extensao: &str| {
-                    endereco.starts_with(CAMINHO_DOS_MODELOS) && endereco.ends_with(extensao)
-                };
-                let arquivos_certos = da_biblioteca(&modelo.glb, ".glb")
-                    && modelo
-                        .usdz
-                        .as_deref()
-                        .is_none_or(|usdz| da_biblioteca(usdz, ".usdz"));
-                if !arquivos_certos {
-                    problemas.push(Problema::bloqueia(
-                        "modelo.arquivo",
-                        format!("corpo[{i}].modelo"),
-                        "Escolha um modelo 3D da biblioteca do site.",
-                    ));
-                }
+                validar_modelo_3d(modelo, &format!("corpo[{i}].modelo"), problemas);
                 if let Some(capa) = capa {
                     validar_alt(capa, &format!("corpo[{i}].capa.alt"), problemas);
                 }
@@ -701,6 +713,33 @@ fn validar_abertura(abertura: &Abertura, problemas: &mut Vec<Problema>) {
     }
     if abertura.acoes.len() > MAXIMO_DE_BOTOES {
         problemas.push(botoes_demais("abertura.acoes".into()));
+    }
+}
+
+fn validar_modelo_3d(modelo: &Modelo3d, campo: &str, problemas: &mut Vec<Problema>) {
+    if modelo.descricao.trim().is_empty() {
+        problemas.push(Problema::bloqueia(
+            "modelo.descricao.vazia",
+            format!("{campo}.descricao"),
+            "Descreva o que o modelo 3D mostra, para quem não o enxerga.",
+        ));
+    }
+    // Só arquivo da biblioteca do próprio site: o visualizador não abre
+    // modelo de outro endereço.
+    let da_biblioteca = |endereco: &str, extensao: &str| {
+        endereco.starts_with(CAMINHO_DOS_MODELOS) && endereco.ends_with(extensao)
+    };
+    let arquivos_certos = da_biblioteca(&modelo.glb, ".glb")
+        && modelo
+            .usdz
+            .as_deref()
+            .is_none_or(|usdz| da_biblioteca(usdz, ".usdz"));
+    if !arquivos_certos {
+        problemas.push(Problema::bloqueia(
+            "modelo.arquivo",
+            campo,
+            "Escolha um modelo 3D da biblioteca do site.",
+        ));
     }
 }
 
@@ -1350,6 +1389,35 @@ mod testes {
             ]
         });
         assert_eq!(validar_sem_contexto(&bom), vec![]);
+    }
+
+    #[test]
+    fn produto_de_catalogo_vale_sem_preco_e_cobra_resumo_ficha_e_modelo() {
+        let documento = demonstracao::item_de_exemplo();
+        assert_eq!(validar_sem_contexto(&documento), vec![]);
+        assert!(documento.tem_modelo_3d());
+
+        let mut ruim = documento.clone();
+        if let Conteudo::Item(item) = &mut ruim.conteudo {
+            item.resumo = " ".into();
+            item.ficha[1].valor = String::new();
+            if let Some(modelo) = &mut item.modelo {
+                modelo.glb = "https://outro.example/m.glb".into();
+            }
+            if let Some(acao) = &mut item.acao {
+                acao.url = "javascript:alert(1)".into();
+            }
+        }
+        let problemas = validar_sem_contexto(&ruim);
+        let achados = codigos(&problemas);
+        for codigo in [
+            "item.resumo.vazio",
+            "item.ficha.incompleta",
+            "modelo.arquivo",
+            "link.invalido",
+        ] {
+            assert!(achados.contains(&codigo), "{codigo}: {achados:?}");
+        }
     }
 
     #[test]

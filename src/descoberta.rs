@@ -129,7 +129,7 @@ pub fn gerar_sitemaps(site: &Site, itens: &ItensDoSite) -> Vec<Arquivo> {
         ("categorias", categorias, false),
         (
             "produtos",
-            do_tipo(|c| matches!(c, Conteudo::Produto(_))),
+            do_tipo(|c| matches!(c, Conteudo::Produto(_) | Conteudo::Item(_))),
             false,
         ),
         ("imagens", com_imagem, true),
@@ -343,6 +343,18 @@ pub fn gerar_llms_completo(site: &Site, itens: &ItensDoSite) -> String {
             canonica(site, &documento.caminho),
             documento.atualizado_em().format("%Y-%m-%d"),
         );
+        // No produto de catálogo, o resumo e a ficha técnica vêm antes do corpo.
+        if let Conteudo::Item(item) = &documento.conteudo {
+            secao.push_str(&format!("\n{}\n", uma_linha(&item.resumo)));
+            let ficha: Vec<String> = item
+                .ficha
+                .iter()
+                .map(|linha| format!("- {}: {}", uma_linha(&linha.nome), uma_linha(&linha.valor)))
+                .collect();
+            if !ficha.is_empty() {
+                secao.push_str(&format!("\n{}\n", ficha.join("\n")));
+            }
+        }
         let texto = texto_do_corpo(documento.corpo());
         if !texto.is_empty() {
             secao.push_str(&format!("\n{texto}\n"));

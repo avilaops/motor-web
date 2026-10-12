@@ -6,9 +6,10 @@ use chrono::{DateTime, NaiveDate, Utc};
 
 use crate::descoberta::PaginaDeCategoria;
 use crate::tipos::{
-    Abertura, Acao, Autor, Avaliacoes, Bloco, Cartao, Categoria, Conteudo, Depoimento, Direitos,
-    Disponibilidade, Documento, Endereco, Formato, ItemTrilha, Midia, Numero, Organizacao, Pagina,
-    Passo, Pergunta, Plano, Post, Product, Seo, Site, TipoPost, Trecho, Variacao, Variante,
+    Abertura, Acao, Autor, Avaliacoes, Bloco, Caracteristica, Cartao, Categoria, Conteudo,
+    Depoimento, Direitos, Disponibilidade, Documento, Endereco, Formato, Item, ItemTrilha, Midia,
+    Modelo3d, Numero, Organizacao, Pagina, Passo, Pergunta, Plano, Post, Product, Seo, Site,
+    TipoPost, Trecho, Variacao, Variante,
 };
 
 const ORIGEM: &str = "https://oficina-exemplo.example";
@@ -276,6 +277,63 @@ pub fn post_de_exemplo() -> Documento {
 
 /// Um produto válido com três variações, para os testes que alteram um campo
 /// por vez.
+/// Um produto de catálogo: ficha técnica, modelo 3D e botão de orçamento, sem
+/// preço. Fica fora de [`documentos`], que é o site de loja da demonstração.
+pub fn item_de_exemplo() -> Documento {
+    let linha = |nome: &str, valor: &str, filtro: bool| Caracteristica {
+        nome: nome.into(),
+        valor: valor.into(),
+        filtro,
+    };
+    Documento {
+        caminho: "/produtos/bancada-de-marceneiro".into(),
+        conteudo: Conteudo::Item(Item {
+            slug: "bancada-de-marceneiro".into(),
+            nome: "Bancada de marceneiro".into(),
+            codigo: Some("OE-B012".into()),
+            resumo:
+                "Bancada de madeira maciça com morsa frontal e prateleira, para oficina e ateliê."
+                    .into(),
+            imagens: vec![midia(
+                "bancada-de-frente",
+                "Bancada de marceneiro vista de frente, com a morsa aberta",
+                1920,
+                1280,
+            )],
+            modelo: Some(Modelo3d {
+                id: "m1".into(),
+                glb: "/midia/modelos/m1.glb".into(),
+                usdz: Some("/midia/modelos/m1.usdz".into()),
+                descricao: "Bancada de marceneiro com morsa frontal".into(),
+            }),
+            ficha: vec![
+                linha("Linha", "Oficina", true),
+                linha("Madeira", "Tauari", true),
+                linha("Medidas", "1,80 × 0,65 × 0,90 m", false),
+                linha("Peso", "74 kg", false),
+            ],
+            corpo: vec![paragrafo(
+                "O tampo tem 6 cm de espessura e furos para grampo a cada 15 cm.",
+            )],
+            acao: Some(Acao {
+                rotulo: "Pedir orçamento".into(),
+                url: "/contato".into(),
+            }),
+            publicado_em: dia(2026, 9, 12),
+            atualizado_em: dia(2026, 9, 20),
+            seo: seo(
+                "Bancada de marceneiro em madeira maciça",
+                "Bancada de marceneiro em tauari maciço, com morsa frontal e prateleira. Veja as medidas, o peso e o modelo em 3D.",
+            ),
+            trilha: trilha(&[
+                ("Início", "/"),
+                ("Produtos", "/produtos"),
+                ("Bancada de marceneiro", "/produtos/bancada-de-marceneiro"),
+            ]),
+        }),
+    }
+}
+
 pub fn produto_de_exemplo() -> Documento {
     Documento {
         caminho: "/produtos/banco-de-madeira-macica".into(),

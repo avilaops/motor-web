@@ -287,6 +287,51 @@ pub struct Product {
     pub trilha: Vec<ItemTrilha>,
 }
 
+/// Um produto de catálogo: o que a empresa oferece, apresentado com ficha
+/// técnica, fotos e modelo 3D. Não tem preço, estoque nem carrinho (isso é do
+/// Lojas, no contrato [`Product`]): o botão leva a pessoa a pedir orçamento.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Item {
+    pub slug: String,
+    pub nome: String,
+    /// O código do produto no catálogo da empresa, como `LD-A034`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub codigo: Option<String>,
+    /// Uma ou duas frases: aparecem no topo da página e no cartão da listagem.
+    pub resumo: String,
+    /// A primeira é a principal.
+    #[serde(default)]
+    pub imagens: Vec<Midia>,
+    /// O modelo 3D do produto, no lugar de destaque da página.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub modelo: Option<Modelo3d>,
+    /// A ficha técnica, na ordem em que aparece.
+    #[serde(default)]
+    pub ficha: Vec<Caracteristica>,
+    #[serde(default)]
+    pub corpo: Vec<Bloco>,
+    /// O botão da página: pedir orçamento, chamar no WhatsApp.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub acao: Option<Acao>,
+    pub publicado_em: DateTime<Utc>,
+    pub atualizado_em: DateTime<Utc>,
+    pub seo: Seo,
+    #[serde(default)]
+    pub trilha: Vec<ItemTrilha>,
+}
+
+/// Uma linha da ficha técnica. A que é `filtro` também separa o catálogo:
+/// a listagem oferece os valores dela para a pessoa escolher.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct Caracteristica {
+    pub nome: String,
+    pub valor: String,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub filtro: bool,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct Variacao {
@@ -649,6 +694,8 @@ pub enum Conteudo {
     Pagina(Pagina),
     Post(Post),
     Produto(Product),
+    /// O produto de catálogo, sem preço.
+    Item(Item),
 }
 
 impl Documento {
@@ -657,6 +704,7 @@ impl Documento {
             Conteudo::Pagina(p) => &p.seo,
             Conteudo::Post(p) => &p.seo,
             Conteudo::Produto(p) => &p.seo,
+            Conteudo::Item(p) => &p.seo,
         }
     }
 
@@ -666,6 +714,7 @@ impl Documento {
             Conteudo::Pagina(p) => &p.titulo,
             Conteudo::Post(p) => &p.titulo,
             Conteudo::Produto(p) => &p.nome,
+            Conteudo::Item(p) => &p.nome,
         }
     }
 
@@ -674,6 +723,7 @@ impl Documento {
             Conteudo::Pagina(p) => &p.slug,
             Conteudo::Post(p) => &p.slug,
             Conteudo::Produto(p) => &p.slug,
+            Conteudo::Item(p) => &p.slug,
         }
     }
 
@@ -682,6 +732,7 @@ impl Documento {
             Conteudo::Pagina(p) => &p.corpo,
             Conteudo::Post(p) => &p.corpo,
             Conteudo::Produto(_) => &[],
+            Conteudo::Item(p) => &p.corpo,
         }
     }
 
@@ -690,6 +741,7 @@ impl Documento {
             Conteudo::Pagina(p) => &p.trilha,
             Conteudo::Post(p) => &p.trilha,
             Conteudo::Produto(p) => &p.trilha,
+            Conteudo::Item(p) => &p.trilha,
         }
     }
 
@@ -698,15 +750,18 @@ impl Documento {
             Conteudo::Pagina(p) => p.atualizado_em,
             Conteudo::Post(p) => p.atualizado_em,
             Conteudo::Produto(p) => p.atualizado_em,
+            Conteudo::Item(p) => p.atualizado_em,
         }
     }
 
-    /// A imagem principal: capa da página ou do post, primeira do produto.
+    /// A imagem principal: capa da página ou do post, primeira do produto
+    /// (o da loja e o de catálogo).
     pub fn capa(&self) -> Option<&Midia> {
         match &self.conteudo {
             Conteudo::Pagina(p) => p.capa.as_ref(),
             Conteudo::Post(p) => Some(&p.capa),
             Conteudo::Produto(p) => p.imagens.first(),
+            Conteudo::Item(p) => p.imagens.first(),
         }
     }
 
@@ -714,20 +769,26 @@ impl Documento {
     pub fn midias(&self) -> Vec<&Midia> {
         let mut midias: Vec<&Midia> = match &self.conteudo {
             Conteudo::Produto(p) => p.imagens.iter().collect(),
+            Conteudo::Item(p) => p.imagens.iter().collect(),
             _ => self.capa().into_iter().collect(),
         };
         midias.extend(self.corpo().iter().flat_map(Bloco::midias));
         midias
     }
 
-    /// Os modelos 3D do corpo, na ordem em que aparecem.
+    /// Os modelos 3D do documento, na ordem em que aparecem: o do produto
+    /// de catálogo e os do corpo.
     pub fn modelos_3d(&self) -> Vec<&Modelo3d> {
-        self.corpo()
-            .iter()
-            .filter_map(|bloco| match bloco {
+        let do_item = match &self.conteudo {
+            Conteudo::Item(item) => item.modelo.as_ref(),
+            _ => None,
+        };
+        do_item
+            .into_iter()
+            .chain(self.corpo().iter().filter_map(|bloco| match bloco {
                 Bloco::Modelo3d { modelo, .. } => Some(modelo),
                 _ => None,
-            })
+            }))
             .collect()
     }
 

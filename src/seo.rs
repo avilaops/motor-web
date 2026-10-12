@@ -113,7 +113,8 @@ pub fn montar_cabecalho(
         })
     };
     let tipo = match &documento.conteudo {
-        Conteudo::Pagina(_) => "website",
+        // O produto de catálogo não tem preço: `product` pediria um.
+        Conteudo::Pagina(_) | Conteudo::Item(_) => "website",
         Conteudo::Post(_) => "article",
         Conteudo::Produto(_) => "product",
     };

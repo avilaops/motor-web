@@ -7,8 +7,8 @@ use crate::conteudo::contar_palavras;
 use crate::midia::{url_principal, variante_principal};
 use crate::seo::canonica;
 use crate::tipos::{
-    Bloco, Conteudo, Disponibilidade, Documento, Midia, Pagina, Post, Product, Site, TipoPost,
-    Variacao,
+    Bloco, Conteudo, Disponibilidade, Documento, Item, Midia, Pagina, Post, Product, Site,
+    TipoPost, Variacao,
 };
 use crate::validacao::{DocumentoInvalido, exigir_publicavel};
 
@@ -23,6 +23,7 @@ pub fn montar_json_ld(documento: &Documento, site: &Site) -> Result<Vec<Value>, 
         Conteudo::Pagina(pagina) => vec![pagina_web(pagina, site, &endereco)],
         Conteudo::Post(post) => vec![artigo(post, site, &endereco)],
         Conteudo::Produto(produto) => vec![produto_ld(produto, site, &endereco)],
+        Conteudo::Item(item) => vec![item_ld(item, site, &endereco)],
     };
     if !documento.eh_home() {
         itens.extend(trilha(documento, site));
@@ -183,6 +184,33 @@ fn pagina_web(pagina: &Pagina, site: &Site, endereco: &str) -> Value {
     if !imagens.is_empty() {
         objeto.insert("image".into(), imagens.into());
     }
+    objeto.insert("isPartOf".into(), json!({ "@id": id_do_site(site) }));
+    Value::Object(objeto)
+}
+
+/// O produto de catálogo sai como página de item, e não como `Product`: sem
+/// preço não há oferta, e o Google trata `Product` sem oferta nem avaliação
+/// como dado inválido.
+fn item_ld(item: &Item, site: &Site, endereco: &str) -> Value {
+    let mut objeto = Map::new();
+    objeto.insert("@context".into(), CONTEXTO.into());
+    objeto.insert("@type".into(), "ItemPage".into());
+    objeto.insert("name".into(), item.nome.clone().into());
+    objeto.insert("url".into(), endereco.into());
+    objeto.insert("description".into(), item.seo.descricao.clone().into());
+    objeto.insert("inLanguage".into(), site.idioma.clone().into());
+    objeto.insert("datePublished".into(), data(item.publicado_em).into());
+    objeto.insert("dateModified".into(), data(item.atualizado_em).into());
+    inserir(
+        &mut objeto,
+        "primaryImageOfPage",
+        item.imagens.first().and_then(|capa| imagem_ld(capa, site)),
+    );
+    let imagens = imagens_ld(&item.imagens, &item.corpo, site);
+    if !imagens.is_empty() {
+        objeto.insert("image".into(), imagens.into());
+    }
+    inserir(&mut objeto, "identifier", texto(&item.codigo));
     objeto.insert("isPartOf".into(), json!({ "@id": id_do_site(site) }));
     Value::Object(objeto)
 }
@@ -389,6 +417,16 @@ mod testes {
             .collect()
     }
 
+    #[test]
+    fn produto_de_catalogo_sai_como_pagina_de_item_sem_oferta() {
+        let itens = montar_json_ld(&demonstracao::item_de_exemplo(), &demonstracao::site())
+            .expect("item válido");
+        assert_eq!(tipos(&itens), ["ItemPage", "BreadcrumbList"]);
+        assert_eq!(itens[0]["identifier"], "OE-B012");
+        assert!(itens[0].get("offers").is_none());
+        assert!(itens[0]["primaryImageOfPage"].is_object());
+    }
+
     fn produto(altera: impl FnOnce(&mut Product)) -> Value {
         let mut documento = demonstracao::produto_de_exemplo();
         if let Conteudo::Produto(produto) = &mut documento.conteudo {
@@ -554,6 +592,7 @@ mod testes {
                     assert_eq!(encontrados[..2], [esperado, "BreadcrumbList"]);
                 }
                 Conteudo::Produto(_) => assert_eq!(encontrados, ["Product", "BreadcrumbList"]),
+                Conteudo::Item(_) => assert_eq!(encontrados[..2], ["ItemPage", "BreadcrumbList"]),
             }
         }
     }
