@@ -28,6 +28,7 @@ O consumo é por commit fixo. Mudou o motor, quem consome atualiza o `rev`.
 | `schema` | `montar_json_ld` |
 | `conteudo` | `renderizar_corpo`, `texto_do_corpo`, `contar_palavras` |
 | `midia` | `renderizar_midia`, `url_principal` |
+| `cor` | `conferir_cor`: a cor de destaque do site e da página, com contraste mínimo contra o branco |
 | `descoberta` | `gerar_sitemaps`, `gerar_robots`, `gerar_llms`, `gerar_llms_completo` |
 | `secoes` | Abertura de página e seções (cartões, destaque, depoimentos, números, passos, planos, galeria, logos, faixa, contato): `renderizar_abertura` e `ESTILO_DAS_SECOES` |
 | `imagem` | `processar_imagem` (só com a *feature* `imagem`) |

@@ -6,6 +6,7 @@
 //! estado global: data e hora entram por parâmetro.
 
 pub mod conteudo;
+pub mod cor;
 pub mod demonstracao;
 pub mod descoberta;
 #[cfg(feature = "imagem")]

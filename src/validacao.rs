@@ -11,9 +11,12 @@ use unicode_normalization::UnicodeNormalization;
 use unicode_normalization::char::is_combining_mark;
 use unicode_segmentation::UnicodeSegmentation;
 
+use crate::cor::conferir_cor;
 use crate::secoes::email_valido;
 use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia, Modelo3d, TipoDeCampo};
-use crate::url::{incorporacao_de_video, link_valido};
+use crate::url::{
+    endereco_absoluto_valido, endereco_web_valido, incorporacao_de_video, link_valido,
+};
 
 /// O nome de uma página no menu: cabe em uma linha no celular.
 pub const MENU_MAXIMO: usize = 24;
@@ -197,6 +200,13 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
                     ),
                 ));
             }
+            if let Some(Err(erro)) = pagina.destaque.as_deref().map(conferir_cor) {
+                problemas.push(Problema::bloqueia(
+                    "pagina.destaque",
+                    "destaque",
+                    erro.to_string(),
+                ));
+            }
         }
         Conteudo::Post(post) => {
             validar_alt(&post.capa, "capa.alt", &mut problemas);
@@ -277,6 +287,24 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
         }
     }
 
+    if let Some(canonica) = documento.seo().canonica.as_deref() {
+        if endereco_absoluto_valido(canonica.trim()) {
+            problemas.push(Problema::avisa(
+                "seo.canonica.outra",
+                "seo.canonica",
+                format!(
+                    "Esta página indica {} como o endereço oficial. Os buscadores mostram aquele endereço, e esta página sai do sitemap.",
+                    canonica.trim()
+                ),
+            ));
+        } else {
+            problemas.push(Problema::bloqueia(
+                "seo.canonica.invalida",
+                "seo.canonica",
+                "O endereço oficial (canônico) precisa ser completo e começar com https://, como https://empresa.com.br/produto.",
+            ));
+        }
+    }
     if !documento.seo().indexar {
         problemas.push(Problema::avisa(
             "seo.noindex",
@@ -747,7 +775,7 @@ fn link_invalido(campo: String) -> Problema {
     Problema::bloqueia(
         "link.invalido",
         campo,
-        "Este link não é válido. Use um endereço que comece com https:// ou um caminho do próprio site, como /contato.",
+        "Este link não é válido. Use um endereço que comece com https://, um caminho do próprio site, como /contato, ou um e-mail, como mailto:contato@empresa.com.br.",
     )
 }
 
@@ -777,7 +805,10 @@ fn validar_direitos(midia: &Midia, campo: &str, problemas: &mut Vec<Problema>) {
         ("licenca", &direitos.licenca),
         ("aquisicao", &direitos.aquisicao),
     ] {
-        if endereco.as_deref().is_some_and(|e| !link_valido(e.trim())) {
+        if endereco
+            .as_deref()
+            .is_some_and(|e| !endereco_web_valido(e.trim()))
+        {
             problemas.push(Problema::bloqueia(
                 "midia.direitos.endereco",
                 format!("{campo}.direitos.{nome}"),
@@ -997,6 +1028,7 @@ mod testes {
                         variantes: vec![],
                         legenda: None,
                         credito: None,
+                        ocultar_credito: false,
                         direitos: Default::default(),
                     },
                     invertido: false,
@@ -1418,6 +1450,57 @@ mod testes {
         ] {
             assert!(achados.contains(&codigo), "{codigo}: {achados:?}");
         }
+    }
+
+    #[test]
+    fn canonica_para_fora_avisa_e_invalida_barra() {
+        let fora = com_post(|p| p.seo.canonica = Some("https://exemplo.com.br/cms".into()));
+        let problemas = validar_sem_contexto(&fora);
+        assert_eq!(codigos(&problemas), vec!["seo.canonica.outra"]);
+        assert_eq!(problemas[0].gravidade, Gravidade::Avisa);
+
+        for ruim in ["/cms", "http://exemplo.com.br/cms", "mailto:a@exemplo.com"] {
+            let invalida = com_post(|p| p.seo.canonica = Some(ruim.into()));
+            assert_eq!(
+                codigos(&validar_sem_contexto(&invalida)),
+                vec!["seo.canonica.invalida"],
+                "{ruim}"
+            );
+        }
+    }
+
+    #[test]
+    fn destaque_da_pagina_segue_a_regra_da_cor_do_site() {
+        let mut documento = demonstracao::documentos()
+            .into_iter()
+            .find(|d| matches!(d.conteudo, Conteudo::Pagina(_)))
+            .expect("página");
+        let Conteudo::Pagina(pagina) = &mut documento.conteudo else {
+            unreachable!()
+        };
+        pagina.destaque = Some("#1d4ed8".into());
+        assert!(!codigos(&validar_sem_contexto(&documento)).contains(&"pagina.destaque"));
+        for ruim in ["#f4c544", "azul"] {
+            if let Conteudo::Pagina(pagina) = &mut documento.conteudo {
+                pagina.destaque = Some(ruim.into());
+            }
+            assert!(
+                codigos(&validar_sem_contexto(&documento)).contains(&"pagina.destaque"),
+                "{ruim}"
+            );
+        }
+    }
+
+    #[test]
+    fn chamada_aceita_mailto() {
+        let com_email = com_post(|p| {
+            p.corpo.push(Bloco::Chamada {
+                texto: "Fale com a gente".into(),
+                rotulo: "Escrever".into(),
+                url: "mailto:comercial@exemplo.com".into(),
+            })
+        });
+        assert!(validar_sem_contexto(&com_email).is_empty());
     }
 
     #[test]

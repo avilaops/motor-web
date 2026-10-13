@@ -102,7 +102,11 @@ fn legenda(midia: &Midia) -> Option<String> {
             .map(String::from)
     };
     // Sem crédito escrito, quem aparece é quem fez a imagem.
-    let credito = preenchido(&midia.credito).or_else(|| preenchido(&midia.direitos.autoria));
+    let credito = if midia.ocultar_credito {
+        None
+    } else {
+        preenchido(&midia.credito).or_else(|| preenchido(&midia.direitos.autoria))
+    };
     match (preenchido(&midia.legenda), credito) {
         (Some(legenda), Some(credito)) => Some(format!("{legenda} Foto: {credito}")),
         (Some(legenda), None) => Some(legenda),
@@ -131,6 +135,19 @@ mod testes {
         );
     }
 
+    #[test]
+    fn credito_oculto_nao_vira_legenda() {
+        let mut midia = midia();
+        midia.credito = Some("Oficina Exemplo".into());
+        midia.ocultar_credito = true;
+        assert!(!renderizar_midia(&midia, Papel::Conteudo, "100vw").contains("Foto:"));
+        midia.legenda = Some("Logo da oficina.".into());
+        assert!(
+            renderizar_midia(&midia, Papel::Conteudo, "100vw")
+                .contains("<figcaption>Logo da oficina.</figcaption>")
+        );
+    }
+
     fn midia() -> Midia {
         let variante = |formato: Formato, largura: u32| Variante {
             formato,
@@ -151,6 +168,7 @@ mod testes {
             ],
             legenda: None,
             credito: None,
+            ocultar_credito: false,
             direitos: Direitos::default(),
         }
     }

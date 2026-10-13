@@ -48,6 +48,7 @@ fn midia(nome: &str, alt: &str, largura: u32, altura: u32) -> Midia {
         variantes,
         legenda: None,
         credito: None,
+        ocultar_credito: false,
         direitos: Direitos::default(),
     }
 }
@@ -58,6 +59,7 @@ fn seo(titulo: &str, descricao: &str) -> Seo {
         descricao: descricao.into(),
         indexar: true,
         imagem_social: None,
+        canonica: None,
     }
 }
 
@@ -243,6 +245,7 @@ pub fn post_de_exemplo() -> Documento {
                 midia: Midia {
                     legenda: Some("Amostras de acabamento sobre a mesma madeira.".into()),
                     credito: Some("Oficina Exemplo".into()),
+                    ocultar_credito: false,
                     direitos: Direitos {
                         autoria: Some("Helena Prado".into()),
                         aviso: Some("© 2026 Oficina Exemplo".into()),
@@ -399,6 +402,7 @@ fn pagina(
             slug: slug.into(),
             titulo: titulo_da_pagina.into(),
             menu: None,
+            destaque: None,
             corpo,
             capa,
             abertura: None,

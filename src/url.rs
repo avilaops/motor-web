@@ -1,8 +1,14 @@
 //! Leitura mínima de endereços. Só o que as regras precisam: saber se um
 //! link é aceitável e achar o endereço de incorporação de um vídeo.
 
-/// Link aceito no conteúdo: `http(s)` ou caminho do próprio site.
+/// Link aceito no conteúdo: `http(s)`, caminho do próprio site ou `mailto:`
+/// com um endereço de e-mail.
 pub(crate) fn link_valido(endereco: &str) -> bool {
+    endereco_web_valido(endereco) || mailto_valido(endereco)
+}
+
+/// Endereço que um navegador abre: `http(s)` ou caminho do próprio site.
+pub(crate) fn endereco_web_valido(endereco: &str) -> bool {
     if endereco.is_empty()
         || endereco
             .chars()
@@ -14,6 +20,41 @@ pub(crate) fn link_valido(endereco: &str) -> bool {
         return !endereco.starts_with("//");
     }
     partes(endereco).is_some_and(|(host, _)| !host.is_empty())
+}
+
+/// Endereço absoluto `https://` com host, como o que vai numa canônica.
+pub(crate) fn endereco_absoluto_valido(endereco: &str) -> bool {
+    endereco.to_ascii_lowercase().starts_with("https://")
+        && endereco_web_valido(endereco)
+        && partes(endereco).is_some_and(|(host, _)| host.contains('.'))
+}
+
+/// `mailto:` com um único destinatário, `nome@dominio.tld`, e assunto
+/// opcional depois de `?`. Sem espaço nem caractere de controle: o resto
+/// do texto vai escapado para o `href`.
+fn mailto_valido(endereco: &str) -> bool {
+    let Some(resto) = endereco
+        .get(..7)
+        .filter(|inicio| inicio.eq_ignore_ascii_case("mailto:"))
+        .map(|_| &endereco[7..])
+    else {
+        return false;
+    };
+    if resto.chars().any(|c| c.is_whitespace() || c.is_control()) {
+        return false;
+    }
+    let destinatario = resto.split('?').next().unwrap_or("");
+    let Some((usuario, dominio)) = destinatario.split_once('@') else {
+        return false;
+    };
+    !usuario.is_empty()
+        && !dominio.contains('@')
+        && !dominio.contains(',')
+        && !usuario.contains(',')
+        && dominio.split('.').all(|parte| {
+            !parte.is_empty() && parte.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+        })
+        && dominio.contains('.')
 }
 
 /// Endereço de incorporação de um vídeo do YouTube ou do Vimeo.
@@ -114,7 +155,6 @@ mod testes {
             "",
             "javascript:alert(1)",
             "//outro.com",
-            "mailto:a@b.c",
             "data:text/html,x",
             "https://",
             "https://a b.com",
@@ -122,6 +162,50 @@ mod testes {
             "https://banco.com@golpe.com/",
         ] {
             assert!(!link_valido(ruim), "{ruim}");
+        }
+    }
+
+    #[test]
+    fn aceita_mailto_com_um_destinatario() {
+        for bom in [
+            "mailto:comercial@exemplo.com.br",
+            "MAILTO:contato@exemplo.com",
+            "mailto:contato@exemplo.com?subject=Or%C3%A7amento",
+        ] {
+            assert!(link_valido(bom), "{bom}");
+        }
+        for ruim in [
+            "mailto:",
+            "mailto:contato",
+            "mailto:@exemplo.com",
+            "mailto:contato@",
+            "mailto:contato@exemplo",
+            "mailto:a@exemplo.com,b@exemplo.com",
+            "mailto:contato@exemplo.com?subject=Oi tudo",
+            "mailto:contato@exe<mplo.com",
+            "mailto:a@b@exemplo.com",
+        ] {
+            assert!(!link_valido(ruim), "{ruim}");
+        }
+    }
+
+    #[test]
+    fn endereco_web_nao_aceita_mailto() {
+        assert!(endereco_web_valido("/contato"));
+        assert!(!endereco_web_valido("mailto:contato@exemplo.com"));
+    }
+
+    #[test]
+    fn canonica_so_com_https_absoluto() {
+        assert!(endereco_absoluto_valido("https://exemplo.com.br/cms"));
+        for ruim in [
+            "http://exemplo.com.br/cms",
+            "/cms",
+            "https://localhost/cms",
+            "mailto:contato@exemplo.com",
+            "https://exemplo.com.br/a b",
+        ] {
+            assert!(!endereco_absoluto_valido(ruim), "{ruim}");
         }
     }
 

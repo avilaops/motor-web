@@ -8,6 +8,7 @@ use crate::escape::{json_para_script, marcacao};
 use crate::midia::variante_principal;
 use crate::schema::montar_json_ld;
 use crate::tipos::{Conteudo, Documento, Midia, Site};
+use crate::url::endereco_absoluto_valido;
 use crate::validacao::DocumentoInvalido;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
@@ -66,7 +67,13 @@ pub fn montar_cabecalho(
     // Valida uma vez: `montar_json_ld` recusa o documento que não pode ser publicado.
     let json_ld = montar_json_ld(documento, site)?;
     let seo = documento.seo();
-    let endereco = canonica(site, &documento.caminho);
+    // Canônica para fora só sai se for válida; a validação já barra a outra.
+    let endereco = seo
+        .canonica
+        .as_deref()
+        .map(str::trim)
+        .filter(|outra| endereco_absoluto_valido(outra))
+        .map_or_else(|| canonica(site, &documento.caminho), String::from);
 
     let mut metas = Vec::new();
     let mut nome = |chave: &str, conteudo: &str| {
@@ -241,6 +248,21 @@ mod testes {
             format!("{origem}/blog/post")
         );
         assert_eq!(canonica(&site, "contato"), format!("{origem}/contato"));
+    }
+
+    #[test]
+    fn canonica_para_fora_vale_no_link_e_no_og() {
+        let site = demonstracao::site();
+        let mut documento = demonstracao::post_de_exemplo();
+        if let Conteudo::Post(post) = &mut documento.conteudo {
+            post.seo.canonica = Some(" https://exemplo.example/oficial ".into());
+        }
+        let cabecalho = montar_cabecalho(&documento, &site).expect("fixture válida");
+        assert_eq!(cabecalho.links[0].href, "https://exemplo.example/oficial");
+        assert_eq!(
+            meta(&cabecalho, "og:url"),
+            Some("https://exemplo.example/oficial")
+        );
     }
 
     #[test]

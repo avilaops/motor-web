@@ -77,6 +77,10 @@ pub struct Midia {
     pub legenda: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credito: Option<String>,
+    /// Não escrever o crédito embaixo da imagem (logo, ícone, ilustração da
+    /// casa). O crédito e os direitos continuam no dado estruturado.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub ocultar_credito: bool,
     #[serde(default, skip_serializing_if = "Direitos::vazio")]
     pub direitos: Direitos,
 }
@@ -159,6 +163,10 @@ pub struct Seo {
     pub indexar: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub imagem_social: Option<Midia>,
+    /// O endereço oficial desta página, quando ele mora em outro lugar
+    /// (`https://` completo). Vazio, a canônica é o próprio caminho.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub canonica: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -198,6 +206,10 @@ pub struct Pagina {
     /// O nome curto da página no menu do site. Sem ele, vale o título.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub menu: Option<String>,
+    /// A cor de destaque desta página (`#rrggbb`), no lugar da do site: a de
+    /// um produto na página que o apresenta. Sem ela, vale a do site.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub destaque: Option<String>,
     #[serde(default)]
     pub corpo: Vec<Bloco>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

@@ -58,13 +58,14 @@ impl Default for OpcoesRobots {
     }
 }
 
-/// O que entra em sitemap e em `llms.txt`: publicável e aberto à busca, em
+/// O que entra em sitemap e em `llms.txt`: publicável, aberto à busca e dono
+/// do próprio endereço (sem canônica para fora), em
 /// ordem de caminho para a saída ser estável.
 fn visiveis<'a>(itens: &ItensDoSite<'a>) -> Vec<&'a Documento> {
     let mut documentos: Vec<&Documento> = itens
         .documentos
         .iter()
-        .filter(|d| d.seo().indexar && exigir_publicavel(d).is_ok())
+        .filter(|d| d.seo().indexar && d.seo().canonica.is_none() && exigir_publicavel(d).is_ok())
         .collect();
     documentos.sort_by(|a, b| a.caminho.cmp(&b.caminho));
     documentos
@@ -459,6 +460,26 @@ mod testes {
             assert!(!posts.conteudo.contains(&canonica(&site, &caminho)));
             assert!(!llms.contains(&canonica(&site, &caminho)));
         }
+    }
+
+    #[test]
+    fn canonica_para_fora_sai_do_sitemap() {
+        let mut documentos = demonstracao::documentos();
+        let mut apontado = String::new();
+        for documento in &mut documentos {
+            if let Conteudo::Post(post) = &mut documento.conteudo {
+                post.seo.canonica = Some("https://exemplo.example/oficial".into());
+                apontado = documento.caminho.clone();
+                break;
+            }
+        }
+        let site = demonstracao::site();
+        let dados = itens(&documentos, &[], &[]);
+        let posts = gerar_sitemaps(&site, &dados)
+            .into_iter()
+            .find(|a| a.caminho == "sitemap-posts.xml")
+            .expect("posts");
+        assert!(!posts.conteudo.contains(&canonica(&site, &apontado)));
     }
 
     #[test]
