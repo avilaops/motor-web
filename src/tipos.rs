@@ -206,6 +206,10 @@ pub struct Pagina {
     /// O nome curto da página no menu do site. Sem ele, vale o título.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub menu: Option<String>,
+    /// A cor de destaque desta página (`#rrggbb`), no lugar da do site: a de
+    /// um produto na página que o apresenta. Sem ela, vale a do site.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub destaque: Option<String>,
     #[serde(default)]
     pub corpo: Vec<Bloco>,
     #[serde(default, skip_serializing_if = "Option::is_none")]

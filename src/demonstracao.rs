@@ -402,6 +402,7 @@ fn pagina(
             slug: slug.into(),
             titulo: titulo_da_pagina.into(),
             menu: None,
+            destaque: None,
             corpo,
             capa,
             abertura: None,

@@ -11,6 +11,7 @@ use unicode_normalization::UnicodeNormalization;
 use unicode_normalization::char::is_combining_mark;
 use unicode_segmentation::UnicodeSegmentation;
 
+use crate::cor::conferir_cor;
 use crate::secoes::email_valido;
 use crate::tipos::{Abertura, Acao, Bloco, Conteudo, Documento, Midia, Modelo3d, TipoDeCampo};
 use crate::url::{
@@ -197,6 +198,13 @@ pub fn validar(documento: &Documento, contexto: &Contexto) -> Vec<Problema> {
                     format!(
                         "O nome no menu passa de {MENU_MAXIMO} caracteres. Use uma ou duas palavras."
                     ),
+                ));
+            }
+            if let Some(Err(erro)) = pagina.destaque.as_deref().map(conferir_cor) {
+                problemas.push(Problema::bloqueia(
+                    "pagina.destaque",
+                    "destaque",
+                    erro.to_string(),
                 ));
             }
         }
@@ -1456,6 +1464,28 @@ mod testes {
             assert_eq!(
                 codigos(&validar_sem_contexto(&invalida)),
                 vec!["seo.canonica.invalida"],
+                "{ruim}"
+            );
+        }
+    }
+
+    #[test]
+    fn destaque_da_pagina_segue_a_regra_da_cor_do_site() {
+        let mut documento = demonstracao::documentos()
+            .into_iter()
+            .find(|d| matches!(d.conteudo, Conteudo::Pagina(_)))
+            .expect("página");
+        let Conteudo::Pagina(pagina) = &mut documento.conteudo else {
+            unreachable!()
+        };
+        pagina.destaque = Some("#1d4ed8".into());
+        assert!(!codigos(&validar_sem_contexto(&documento)).contains(&"pagina.destaque"));
+        for ruim in ["#f4c544", "azul"] {
+            if let Conteudo::Pagina(pagina) = &mut documento.conteudo {
+                pagina.destaque = Some(ruim.into());
+            }
+            assert!(
+                codigos(&validar_sem_contexto(&documento)).contains(&"pagina.destaque"),
                 "{ruim}"
             );
         }
