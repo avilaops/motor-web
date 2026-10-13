@@ -26,8 +26,8 @@ Mudou o comportamento do crate, aquele documento muda no mesmo trabalho.
   regra por ele. Renomear código é mudança incompatível.
 - **Texto de quem edita nunca é marcação.** Tudo que vai para HTML ou XML passa
   por `escape::marcacao`; JSON dentro de `<script>` passa por
-  `escape::json_para_script`. Link só `http(s)` ou caminho do próprio site;
-  vídeo só YouTube e Vimeo.
+  `escape::json_para_script`. Link só `http(s)`, caminho do próprio site ou
+  `mailto:` com um destinatário; vídeo só YouTube e Vimeo.
 - **O corpo não gera `<h1>`.** O `<h1>` é o título do documento, e quem o põe
   na página é o template de quem consome.
 - **O motor não conhece cliente nem rota.** O caminho de cada documento vem de
