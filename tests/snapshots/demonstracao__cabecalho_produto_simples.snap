@@ -8,16 +8,17 @@ expression: cabecalho.para_html()
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Tábua de corte em madeira de topo">
 <meta name="twitter:description" content="Tábua de corte artesanal em madeira de topo, com acabamento em óleo mineral próprio para contato com alimentos.">
-<meta name="twitter:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp">
+<meta name="twitter:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.jpg">
 <meta property="og:type" content="product">
 <meta property="og:site_name" content="Oficina Exemplo">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:title" content="Tábua de corte em madeira de topo">
 <meta property="og:description" content="Tábua de corte artesanal em madeira de topo, com acabamento em óleo mineral próprio para contato com alimentos.">
 <meta property="og:url" content="https://oficina-exemplo.example/produtos/tabua-de-corte">
-<meta property="og:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp">
+<meta property="og:image" content="https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="800">
+<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:alt" content="Tábua de corte em madeira de topo vista de cima">
 <link rel="canonical" href="https://oficina-exemplo.example/produtos/tabua-de-corte">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Tábua de corte","description":"Tábua de corte em madeira de topo, com acabamento em óleo mineral próprio para alimentos.","url":"https://oficina-exemplo.example/produtos/tabua-de-corte","image":[{"@type":"ImageObject","url":"https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp","contentUrl":"https://oficina-exemplo.example/midia/tabua-de-corte-vista-de-cima-0a1b2c3d-1200.webp","width":1200,"height":800,"description":"Tábua de corte em madeira de topo vista de cima","creditText":"Oficina Exemplo"}],"sku":"TABUA-01","brand":{"@type":"Brand","name":"Oficina Exemplo"},"offers":{"@type":"Offer","url":"https://oficina-exemplo.example/produtos/tabua-de-corte","name":"Única","sku":"TABUA-01","priceCurrency":"BRL","price":"189.90","availability":"https://schema.org/InStock","hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"BR","merchantReturnLink":"https://oficina-exemplo.example/trocas-e-devolucoes"}}}</script>
