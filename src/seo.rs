@@ -7,7 +7,7 @@ use serde_json::Value;
 use crate::escape::{json_para_script, marcacao};
 use crate::midia::variante_principal;
 use crate::schema::montar_json_ld;
-use crate::tipos::{Conteudo, Documento, Midia, Site};
+use crate::tipos::{Conteudo, Documento, Formato, Midia, Site, Variante};
 use crate::url::endereco_absoluto_valido;
 use crate::validacao::DocumentoInvalido;
 
@@ -135,6 +135,7 @@ pub fn montar_cabecalho(
         propriedade("og:image", &imagem.url);
         propriedade("og:image:width", &imagem.largura.to_string());
         propriedade("og:image:height", &imagem.altura.to_string());
+        propriedade("og:image:type", imagem.tipo);
         propriedade("og:image:alt", &imagem.alt);
     }
     if let Conteudo::Post(post) = &documento.conteudo {
@@ -163,13 +164,28 @@ pub fn montar_cabecalho(
 
 struct ImagemSocial {
     url: String,
+    tipo: &'static str,
     largura: u32,
     altura: u32,
     alt: String,
 }
 
+/// A extensão do JPEG que quem consome serve ao lado de cada WebP, com o
+/// mesmo nome: WhatsApp, Telegram e outros leitores de prévia não abrem WebP.
+pub const EXTENSAO_SOCIAL: &str = "jpg";
+
+/// O endereço que vai no `og:image`: o JPEG irmão do WebP. Outro formato
+/// segue como está.
+pub fn url_social(variante: &Variante) -> (String, &'static str) {
+    match (variante.formato, variante.url.strip_suffix(".webp")) {
+        (Formato::Webp, Some(nome)) => (format!("{nome}.{EXTENSAO_SOCIAL}"), "image/jpeg"),
+        _ => (variante.url.clone(), variante.formato.tipo_mime()),
+    }
+}
+
 fn imagem_social(midia: &Midia, site: &Site) -> Option<ImagemSocial> {
     let variante = variante_principal(midia)?;
+    let (url, tipo) = url_social(variante);
     // A variante guarda só a largura; a altura segue a proporção do original.
     let altura = if midia.largura == 0 {
         0
@@ -177,7 +193,8 @@ fn imagem_social(midia: &Midia, site: &Site) -> Option<ImagemSocial> {
         (u64::from(midia.altura) * u64::from(variante.largura) / u64::from(midia.largura)) as u32
     };
     Some(ImagemSocial {
-        url: site.url_absoluta(&variante.url),
+        url: site.url_absoluta(&url),
+        tipo,
         largura: variante.largura,
         altura,
         alt: midia.alt.clone(),
@@ -287,7 +304,34 @@ mod testes {
         );
         assert!(meta(&cabecalho, "og:image").is_some_and(|url| url.starts_with(&site.origem)));
         assert_eq!(meta(&cabecalho, "og:image:width"), Some("1200"));
+        assert_eq!(meta(&cabecalho, "og:image:type"), Some("image/jpeg"));
+        let imagem = meta(&cabecalho, "og:image").expect("og:image");
+        assert!(imagem.ends_with("-1200.jpg"), "{imagem}");
+        assert_eq!(meta(&cabecalho, "twitter:image"), Some(imagem));
         assert!(meta(&cabecalho, "article:published_time").is_some_and(|d| d.ends_with('Z')));
+    }
+
+    #[test]
+    fn imagem_social_e_o_jpeg_irmao_do_webp() {
+        let webp = Variante {
+            formato: Formato::Webp,
+            largura: 1024,
+            url: "/m/icone-1a2b3c4d-1024.webp".into(),
+        };
+        assert_eq!(
+            url_social(&webp),
+            ("/m/icone-1a2b3c4d-1024.jpg".into(), "image/jpeg")
+        );
+        // Sem WebP, o formato que houver segue como está, com o tipo dele.
+        let avif = Variante {
+            formato: Formato::Avif,
+            largura: 1024,
+            url: "/m/icone-1a2b3c4d-1024.avif".into(),
+        };
+        assert_eq!(
+            url_social(&avif),
+            ("/m/icone-1a2b3c4d-1024.avif".into(), "image/avif")
+        );
     }
 
     #[test]
