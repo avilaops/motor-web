@@ -51,3 +51,10 @@ e `cargo test --all-features`. Rodar também `cargo test` sem a *feature*
 
 CMS e Lojas fixam o crate por commit (`rev` no `Cargo.toml`). Mudança aqui não
 chega a eles sozinha: é preciso atualizar o `rev` em cada um.
+
+## Controle da equipe
+
+Para coordenar demandas deste projeto, leia [.agents/equipe/README.md](.agents/equipe/README.md).
+O registro de responsaveis, tarefas, decisoes e integracoes fica em `.agents/equipe/controle.json`.
+A skill de coordenacao esta em `.agents/skills/avila-motor-web-equipe/SKILL.md`.
+Mantenha evidencias e estado atualizados; as regras especificas deste repositorio continuam valendo.
