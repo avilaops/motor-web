@@ -1,0 +1,39 @@
+{
+  "name": "@avilaops/publicacao-texto",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "types": "./js/publicacao.d.ts",
+      "default": "./js/publicacao.mjs"
+    },
+    "./arquivos": {
+      "types": "./js/arquivos.d.ts",
+      "default": "./js/arquivos.mjs"
+    }
+  },
+  "bin": {
+    "publicar-texto": "./bin/publicar-texto.mjs"
+  },
+  "files": [
+    "js",
+    "bin"
+  ],
+  "scripts": {
+    "test": "node --test tests-js/*.test.mjs"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "2.1.0",
+    "parse5": "8.1.1",
+    "turndown": "7.2.5",
+    "turndown-plugin-gfm": "1.0.2"
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "3.1.1",
+    "remark-frontmatter": "5.0.0"
+  }
+}
