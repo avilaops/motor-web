@@ -1,6 +1,7 @@
 import { parse, serialize } from 'parse5';
+import { createDocument } from '@mixmark-io/domino';
 import TurndownService from 'turndown';
-import extensoes from 'turndown-plugin-gfm';
+import { gfm } from 'turndown-plugin-gfm';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 
 const PRIVADO = /^\/(?:[a-z]{2}(?:-[a-z]{2})?\/)?(?:api|painel|admin|dashboard|login|entrar|auth|conta|checkout|carrinho|cadastro|register)(?:\/|\.html?$|$)/i;
@@ -137,8 +138,10 @@ export function converterHtml(html, { url: valorUrl, formato = 'mdx' }) {
     ...(atualizado ? { updated: atualizado } : {}),
   };
   const conversor = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-' });
-  conversor.use(extensoes.gfm);
-  let corpo = conversor.turndown(serialize(conteudo)).trim();
+  conversor.use(gfm);
+  const raiz = createDocument().createElement('x-turndown');
+  raiz.innerHTML = serialize(conteudo);
+  let corpo = conversor.turndown(raiz).trim();
   if (!encontrar(conteudo, no => no.tagName === 'h1') && metadados.title) corpo = `# ${metadados.title}\n\n${corpo}`;
   corpo = escaparTexto(corpo);
   const cabecalho = Object.entries(metadados).map(([chave, valor]) => `${chave}: ${valorYaml(valor)}`).join('\n');
