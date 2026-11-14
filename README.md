@@ -53,7 +53,24 @@ código MDX. HTML editorial é escapado nos dois formatos. Código literal em
 cercas e inline é preservado a partir da árvore Markdown; código indentado
 não é tratado como uma região segura no MDX.
 
-## Uso
+## Descoberta pública para agentes
+
+O mesmo pacote Node oferece um gerador puro de catálogos ARD, um publicador
+de diretório e um adaptador opcional WebMCP de leitura. Execute depois do
+build, antes do deploy:
+
+```bash
+node bin/publicar-descoberta.mjs --diretorio dist --origem https://empresa.example
+```
+
+Para excluir cópias de rotas publicadas por outro sistema, repita
+`--excluir-prefixo /rota/`. Esses arquivos ficam intactos e fora do catálogo.
+O comando preserva `robots.txt`, redirects, scripts e JSON-LD existentes;
+recusa colisões com arquivos manuais e não segue symlinks.
+
+Veja [o contrato e os limites da descoberta pública](docs/descoberta-publica.md).
+
+## Uso do crate Rust
 
 ```toml
 [dependencies]
