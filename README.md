@@ -7,6 +7,52 @@ da página: cabeçalho, JSON-LD, HTML do corpo e das imagens, sitemaps,
 
 Não tem banco, rede, relógio nem estado global. Mesma entrada, mesma saída.
 
+## Publicação de MDX e Markdown com Node
+
+O pacote opcional `@avilaops/publicacao-texto` converte o HTML do artefato de
+publicação em versões `.mdx` e `.md`. Quem usa apenas o crate Rust continua
+usando Cargo; o pacote Node não altera suas dependências ou contratos.
+
+```bash
+npm ci --ignore-scripts
+npm test
+node bin/publicar-texto.mjs --diretorio caminho/do/artefato --origem https://oficina-exemplo.example
+```
+
+Execute o comando depois do build e antes do deploy. Ele percorre as páginas
+HTML, gera as versões textuais, acrescenta links de descoberta e registra a
+cobertura em `publicacao-texto.json`. A saída inclui regras de `_headers` para
+Cloudflare Pages, com tipo de conteúdo e `noindex` nas cópias textuais. O
+`llms.txt` existente é preservado e recebe uma seção com as versões Markdown.
+
+Uma rota `/guias/pecas/` gera `/guias/pecas/index.mdx` e
+`/guias/pecas/index.md`; arquivos legados, como `/guia.html`, recebem a extensão
+adicional (`/guia.html.mdx`). O endereço de saída vem da rota original, mesmo
+quando duas páginas têm a mesma canônica.
+
+O comando exclui rotas privadas, páginas de erro e conteúdo marcado como
+`noindex` ou `none`, considerando todas as metatags `robots` e as regras
+`X-Robots-Tag` de `_headers`. São respeitados padrões de URL, hosts,
+placeholders, splats e a ordem de remoção e adição desses cabeçalhos.
+Para arquivos `.html`, uma restrição na URL com ou sem extensão exclui a
+página. Os nomes do filesystem são codificados por segmento; percentuais
+literais não mudam o diretório de saída.
+
+Um shell de aplicação sem texto renderizado faz a etapa falhar,
+pois não comprova a cobertura do conteúdo. Arquivos manuais não são
+sobrescritos, symlinks não são seguidos e apenas saídas reconhecidas pelo
+manifesto anterior podem ser retiradas quando o HTML deixa de existir ou
+passa a ser excluído. Nesse caso, seus links de descoberta gerados também
+são retirados do HTML. A edição preserva scripts e comentários existentes.
+
+Para um adaptador de aplicativo, `converterHtml(html, { url, formato })`
+devolve conteúdo, metadados, links e a decisão de indexação. O adaptador deve
+preservar autorização, isolamento de loja e política de cache do HTML. A
+função não acessa rede, disco ou relógio, e nunca usa texto editorial como
+código MDX. HTML editorial é escapado nos dois formatos. Código literal em
+cercas e inline é preservado a partir da árvore Markdown; código indentado
+não é tratado como uma região segura no MDX.
+
 ## Uso
 
 ```toml
