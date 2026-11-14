@@ -1,4 +1,5 @@
 import { parse, serialize } from 'parse5';
+import { createDocument } from '@mixmark-io/domino';
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { fromMarkdown } from 'mdast-util-from-markdown';
@@ -138,7 +139,9 @@ export function converterHtml(html, { url: valorUrl, formato = 'mdx' }) {
   };
   const conversor = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced', bulletListMarker: '-' });
   conversor.use(gfm);
-  let corpo = conversor.turndown(serialize(conteudo)).trim();
+  const raiz = createDocument().createElement('x-turndown');
+  raiz.innerHTML = serialize(conteudo);
+  let corpo = conversor.turndown(raiz).trim();
   if (!encontrar(conteudo, no => no.tagName === 'h1') && metadados.title) corpo = `# ${metadados.title}\n\n${corpo}`;
   corpo = escaparTexto(corpo);
   const cabecalho = Object.entries(metadados).map(([chave, valor]) => `${chave}: ${valorYaml(valor)}`).join('\n');
