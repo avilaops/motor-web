@@ -3,6 +3,9 @@ import { resolve, relative, dirname, sep } from 'node:path';
 import { parse } from 'parse5';
 import { converterHtml, caminhosDeTexto } from './publicacao.mjs';
 
+// Compartilhados pelos adaptadores de arquivos; não fazem parte do contrato tipado.
+export { destinoSeguro, listarHtml, rotaDoArquivo, regrasRobots, noindexNosCabecalhos };
+
 const GERADOR = '@avilaops/publicacao-texto';
 const MARCA = `generator: "${GERADOR}"`;
 const MANIFESTO = 'publicacao-texto.json';

@@ -14,14 +14,28 @@
     "./arquivos": {
       "types": "./js/arquivos.d.ts",
       "default": "./js/arquivos.mjs"
+    },
+    "./descoberta": {
+      "types": "./js/descoberta.d.ts",
+      "default": "./js/descoberta.mjs"
+    },
+    "./descoberta/navegador": {
+      "types": "./js/descoberta-navegador.d.ts",
+      "default": "./js/descoberta-navegador.mjs"
+    },
+    "./descoberta/arquivos": {
+      "types": "./js/descoberta-arquivos.d.ts",
+      "default": "./js/descoberta-arquivos.mjs"
     }
   },
   "bin": {
-    "publicar-texto": "./bin/publicar-texto.mjs"
+    "publicar-texto": "./bin/publicar-texto.mjs",
+    "publicar-descoberta": "./bin/publicar-descoberta.mjs"
   },
   "files": [
     "js",
-    "bin"
+    "bin",
+    "docs/descoberta-publica.md"
   ],
   "scripts": {
     "test": "node --test tests-js/*.test.mjs"
