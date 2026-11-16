@@ -168,7 +168,7 @@ function referencias(html, caminhos) {
 }
 
 /** Executado no artefato de build, antes de qualquer publicação. */
-export async function publicarDiretorio({ diretorio, origem }) {
+export async function publicarDiretorio({ diretorio, origem, indexarTexto = false }) {
   caminhosDeTexto(origem);
   const raiz = await realpath(resolve(diretorio));
   const manifestoArquivo = await destinoSeguro(raiz, `/${MANIFESTO}`);
@@ -222,6 +222,35 @@ export async function publicarDiretorio({ diretorio, origem }) {
     const texto = await lerSeExiste(destino);
     if (texto !== undefined && texto.includes(MARCA)) remover.push(destino);
   }
+  const inicio = '# publicacao-texto:inicio';
+  const fim = '# publicacao-texto:fim';
+  const diretiva = indexarTexto ? 'index,follow' : 'noindex';
+  const regrasCanonicas = new Map();
+  if (indexarTexto) for (const p of paginas) {
+    const arvore = [];
+    const visitar = no => { arvore.push(no); for (const filho of no.childNodes || []) visitar(filho); };
+    visitar(parse(p.html));
+    const link = arvore.find(no => no.tagName === 'link' && no.attrs?.some(a => a.name === 'rel' && a.value === 'canonical'));
+    const valor = link?.attrs?.find(a => a.name === 'href')?.value;
+    const canonical = new URL(valor || p.url, origem);
+    if (canonical.origin !== new URL(origem).origin || canonical.username || canonical.password || /[\r\n<>]/.test(canonical.href)) throw new Error('Canonical do texto inválida.');
+    if (canonical.search || canonical.hash) throw new Error('Canonical do texto precisa ser pública e sem consulta ou fragmento.');
+    const esperada = new URL(p.url);
+    esperada.pathname = esperada.pathname.replace(/\/index\.html?$/i, '/').replace(/\.html?$/i, '');
+    for (const caminho of [p.md, p.mdx]) {
+      let padrao = caminho, destino = canonical.href;
+      if (canonical.href === esperada.href && caminho !== '/index.md' && caminho !== '/index.mdx') {
+        const partes = caminho.slice(1).split('/');
+        const variaveis = partes.map((parte, indice) => /^index\.mdx?$/.test(parte) ? parte : `:p${indice}` + (parte.match(/\.html?\.mdx?$/)?.[0] || ''));
+        padrao = '/' + variaveis.join('/');
+        const rota = variaveis.filter(parte => !/^index\.mdx?$/.test(parte)).map(parte => parte.replace(/\.html?\.mdx?$/, ''));
+        destino = new URL(origem).origin + '/' + rota.join('/') + (canonical.pathname.endsWith('/') ? '/' : '');
+      }
+      regrasCanonicas.set(padrao, `${padrao}\n  Link: <${destino}>; rel="canonical"`);
+    }
+  }
+  const canonicalsTexto = [...regrasCanonicas.values()].sort().join('\n');
+  const bloco = `${inicio}\n/*.md\n  ! Content-Type\n  Content-Type: text/markdown; charset=utf-8\n  X-Robots-Tag: ${diretiva}\n/*.mdx\n  ! Content-Type\n  Content-Type: text/mdx; charset=utf-8\n  X-Robots-Tag: ${diretiva}\n${canonicalsTexto ? canonicalsTexto + '\n' : ''}${fim}`;
   for (const [arquivo, conteudo] of saidas) {
     await mkdir(dirname(arquivo), { recursive: true });
     await writeFile(arquivo, conteudo, 'utf8');
@@ -230,9 +259,6 @@ export async function publicarDiretorio({ diretorio, origem }) {
   const indice = manifestadas.map(p => `- [${p.title.replace(/[\r\n\[\]]/g, ' ')}](${new URL(p.md, origem).href})`).join('\n');
   await writeFile(llmsArquivo, secaoGerada(llms || `# ${manifestadas.find(p => p.rota === '/')?.title || 'Conteúdo público'}\n`, `## Versões de texto das páginas\n\n${indice}`, 'indice'), 'utf8');
   for (const [arquivo, html] of htmlAtualizados) await writeFile(arquivo, html, 'utf8');
-  const inicio = '# publicacao-texto:inicio';
-  const fim = '# publicacao-texto:fim';
-  const bloco = `${inicio}\n/*.md\n  ! Content-Type\n  Content-Type: text/markdown; charset=utf-8\n  X-Robots-Tag: noindex\n/*.mdx\n  ! Content-Type\n  Content-Type: text/mdx; charset=utf-8\n  X-Robots-Tag: noindex\n${fim}`;
   const primeiro = cabecalhos.indexOf(inicio);
   const ultimo = primeiro >= 0 ? cabecalhos.indexOf(fim, primeiro) : -1;
   const atualizados = primeiro >= 0 && ultimo >= 0 ? `${cabecalhos.slice(0, primeiro)}${bloco}${cabecalhos.slice(ultimo + fim.length)}` : `${cabecalhos.trimEnd()}\n\n${bloco}\n`.trimStart();

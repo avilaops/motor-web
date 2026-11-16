@@ -4,4 +4,4 @@ export interface ManifestoPublicacao {
   paginas: Array<{ rota: string; url: string; md: string; mdx: string; title: string; updated?: string }>;
   ignoradas: Array<{ rota?: string; arquivo?: string; motivo: string }>;
 }
-export function publicarDiretorio(opcoes: { diretorio: string; origem: string }): Promise<ManifestoPublicacao>;
+export function publicarDiretorio(opcoes: { diretorio: string; origem: string; indexarTexto?: boolean }): Promise<ManifestoPublicacao>;
