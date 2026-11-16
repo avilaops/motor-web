@@ -30,7 +30,8 @@
   },
   "bin": {
     "publicar-texto": "./bin/publicar-texto.mjs",
-    "publicar-descoberta": "./bin/publicar-descoberta.mjs"
+    "publicar-descoberta": "./bin/publicar-descoberta.mjs",
+    "publicar-seo": "./bin/publicar-seo.mjs"
   },
   "files": [
     "js",

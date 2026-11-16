@@ -41,6 +41,19 @@ test('exporta todas as rotas do build e não usa canonical para nomear os arquiv
   assert.match(await readFile(join(raiz, '_headers'), 'utf8'), /text\/markdown/);
 });
 
+test('opção de indexação do texto usa canonical HTTP e preserva o padrão dos demais consumidores', async t => {
+  const raiz = await ambiente(t);
+  await writeFile(join(raiz, 'index.html'), html('Início'));
+  await writeFile(join(raiz, 'legado.html'), html('Legado').replace(`href="${origem}/"`, `href="${origem}/legado"`));
+  await publicarDiretorio({ diretorio: raiz, origem, indexarTexto: true });
+  const cabecalhos = await readFile(join(raiz, '_headers'), 'utf8');
+  assert.doesNotMatch(cabecalhos, /X-Robots-Tag: noindex/);
+  assert.match(cabecalhos, /X-Robots-Tag: index,follow/);
+  assert.match(cabecalhos, /\/:p0.html.mdx\n  Link: <https:\/\/oficina-exemplo.example\/:p0>; rel="canonical"/);
+  await publicarDiretorio({ diretorio: raiz, origem });
+  assert.match(await readFile(join(raiz, '_headers'), 'utf8'), /X-Robots-Tag: noindex/);
+});
+
 test('atualização e remoção acompanham o HTML sem duplicar tags ou perder cabeçalhos', async t => {
   const raiz = await ambiente(t);
   await mkdir(join(raiz, 'guias'));
